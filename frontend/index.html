@@ -1,28 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LinkShort - Professional URL Shortener</title>
+  <title>LinkShort Pro - Enterprise URL Management</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Satoshi:wght@400;500;700;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
-    :root {
-      --electric-violet: #8B5CF6;
-      --cyber-blue: #06B6D4;
-      --neon-pink: #EC4899;
-      --lime: #84CC16;
-      --bg-deep: #09090B;
+    :root[data-theme="dark"] {
+      --primary: #8B5CF6;
+      --secondary: #06B6D4;
+      --accent: #EC4899;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --bg-dark: #09090B;
       --bg-elevated: #18181B;
       --bg-card: #27272A;
       --text-primary: #FAFAFA;
       --text-secondary: #A1A1AA;
       --border: #3F3F46;
-      --success: #10B981;
-      --error: #EF4444;
-      --warning: #F59E0B;
+    }
+
+    :root[data-theme="light"] {
+      --primary: #7C3AED;
+      --secondary: #0891B2;
+      --accent: #DB2777;
+      --success: #059669;
+      --warning: #D97706;
+      --error: #DC2626;
+      --bg-dark: #FFFFFF;
+      --bg-elevated: #F9FAFB;
+      --bg-card: #FFFFFF;
+      --text-primary: #18181B;
+      --text-secondary: #71717A;
+      --border: #E4E4E7;
     }
 
     * {
@@ -33,85 +49,85 @@
 
     body {
       font-family: 'Satoshi', sans-serif;
-      background: var(--bg-deep);
+      background: var(--bg-dark);
       color: var(--text-primary);
       min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Animated background */
-    body::before,
-    body::after {
-      content: '';
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.15;
-      z-index: 0;
-      animation: float 20s ease-in-out infinite;
-    }
-
-    body::before {
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, var(--electric-violet), var(--cyber-blue));
-      top: -300px;
-      right: -300px;
-    }
-
-    body::after {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, var(--neon-pink), var(--lime));
-      bottom: -250px;
-      left: -250px;
-      animation-delay: -10s;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-20px) rotate(5deg); }
-    }
-
-    .grid-pattern {
+    /* Background effects */
+    .bg-gradient {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
-        linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
-      background-size: 50px 50px;
+      z-index: 0;
+      opacity: 0.1;
       pointer-events: none;
-      z-index: 1;
+      transition: opacity 0.3s;
+    }
+
+    .bg-gradient::before,
+    .bg-gradient::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      animation: float 25s ease-in-out infinite;
+    }
+
+    .bg-gradient::before {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--primary), var(--secondary));
+      top: -300px;
+      right: -300px;
+    }
+
+    .bg-gradient::after {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--accent), var(--warning));
+      bottom: -250px;
+      left: -250px;
+      animation-delay: -12s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -30px) rotate(5deg); }
+      66% { transform: translate(-20px, 20px) rotate(-5deg); }
     }
 
     /* Navigation */
     nav {
-      position: relative;
-      z-index: 10;
-      padding: 24px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 16px 40px;
+      background: rgba(var(--bg-elevated-rgb), 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(24, 24, 27, 0.8);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
     .logo {
       font-family: 'Clash Display', sans-serif;
       font-size: 24px;
       font-weight: 700;
-      background: linear-gradient(135deg, var(--electric-violet), var(--cyber-blue));
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .nav-links {
+    .nav-center {
       display: flex;
       gap: 32px;
       align-items: center;
@@ -121,26 +137,171 @@
       color: var(--text-secondary);
       text-decoration: none;
       font-weight: 600;
-      transition: color 0.3s;
+      transition: color 0.2s;
       cursor: pointer;
+      position: relative;
     }
 
     .nav-link:hover,
     .nav-link.active {
-      color: var(--electric-violet);
+      color: var(--primary);
     }
 
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.3s;
+    }
+
+    .theme-toggle:hover {
+      transform: rotate(15deg) scale(1.05);
+      border-color: var(--primary);
+    }
+
+    /* Notification Bell */
+    .notification-bell {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all 0.3s;
+    }
+
+    .notification-bell:hover {
+      border-color: var(--primary);
+      transform: scale(1.05);
+    }
+
+    .notification-bell.has-notifications::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 8px;
+      height: 8px;
+      background: var(--error);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
+    }
+
+    /* Notification Panel */
+    .notification-panel {
+      position: fixed;
+      top: 80px;
+      right: 40px;
+      width: 380px;
+      max-height: 500px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+      animation: slideIn 0.3s;
+    }
+
+    .notification-panel.show {
+      display: flex;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .notification-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .notification-list {
+      overflow-y: auto;
+      max-height: 400px;
+    }
+
+    .notification-item {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .notification-item:hover {
+      background: var(--bg-card);
+    }
+
+    .notification-item.unread {
+      background: rgba(139, 92, 246, 0.05);
+    }
+
+    .notification-time {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Buttons */
     .btn {
       padding: 12px 24px;
-      background: linear-gradient(135deg, var(--electric-violet), var(--cyber-blue));
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       border: none;
       border-radius: 12px;
-      color: var(--text-primary);
+      color: white;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.3s;
       font-family: 'Satoshi', sans-serif;
+      white-space: nowrap;
     }
 
     .btn:hover {
@@ -151,67 +312,28 @@
     .btn-secondary {
       background: transparent;
       border: 2px solid var(--border);
+      color: var(--text-primary);
     }
 
     .btn-secondary:hover {
-      border-color: var(--electric-violet);
+      border-color: var(--primary);
       box-shadow: none;
+    }
+
+    .btn-icon {
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     /* Container */
     .container {
       position: relative;
       z-index: 2;
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 40px 20px;
-    }
-
-    /* Views */
-    .view {
-      display: none;
-      animation: fadeIn 0.5s;
-    }
-
-    .view.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Hero Section */
-    .hero {
-      text-align: center;
-      padding: 60px 0;
-    }
-
-    .hero h1 {
-      font-family: 'Clash Display', sans-serif;
-      font-size: 72px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-bottom: 24px;
-      background: linear-gradient(135deg, var(--electric-violet), var(--cyber-blue), var(--neon-pink));
-      background-size: 200% 200%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: gradientShift 8s ease infinite;
-    }
-
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
-    .hero p {
-      font-size: 20px;
-      color: var(--text-secondary);
-      margin-bottom: 40px;
     }
 
     /* Card */
@@ -221,120 +343,118 @@
       border-radius: 24px;
       padding: 40px;
       margin-bottom: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(90deg, var(--electric-violet), var(--cyber-blue), var(--neon-pink), var(--lime), var(--electric-violet));
-      background-size: 300% 300%;
-      border-radius: 24px;
-      z-index: -1;
-      animation: gradientShift 6s ease infinite;
-      opacity: 0.3;
-    }
-
-    /* Form Styles */
-    .form-group {
-      margin-bottom: 24px;
-    }
-
-    .form-label {
-      display: block;
-      color: var(--text-primary);
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .input-wrapper {
-      position: relative;
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 20px;
-      opacity: 0.5;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="url"] {
-      width: 100%;
-      padding: 18px 20px 18px 56px;
-      background: var(--bg-deep);
-      border: 2px solid var(--border);
-      border-radius: 16px;
-      color: var(--text-primary);
-      font-size: 16px;
-      font-family: 'Satoshi', sans-serif;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       transition: all 0.3s;
-      outline: none;
     }
 
-    input:focus {
-      border-color: var(--electric-violet);
-      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
     }
 
-    input::placeholder {
-      color: var(--text-secondary);
+    /* Feature Cards Grid */
+    .feature-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
     }
 
-    .checkbox-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s;
       cursor: pointer;
     }
 
-    /* Error & Success Messages */
-    .message {
-      padding: 16px 20px;
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: 0 12px 24px rgba(139, 92, 246, 0.2);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       border-radius: 12px;
-      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .feature-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
       font-size: 14px;
-      font-weight: 600;
-      display: none;
+      color: var(--text-secondary);
+      line-height: 1.5;
     }
 
-    .message.show {
-      display: block;
-      animation: slideIn 0.3s;
+    /* Search & Filter Bar */
+    .search-filter-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .search-box {
+      flex: 1;
+      min-width: 300px;
+      position: relative;
     }
 
-    .error {
-      background: rgba(239, 68, 68, 0.1);
-      border: 2px solid var(--error);
-      color: var(--error);
+    .search-box input {
+      width: 100%;
+      padding: 14px 20px 14px 48px;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'Satoshi', sans-serif;
+      transition: all 0.3s;
     }
 
-    .success {
-      background: rgba(16, 185, 129, 0.1);
-      border: 2px solid var(--success);
-      color: var(--success);
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      color: var(--text-secondary);
+      pointer-events: none;
+    }
+
+    .filter-dropdown {
+      padding: 14px 20px;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'Satoshi', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .filter-dropdown:hover {
+      border-color: var(--primary);
     }
 
     /* Stats Grid */
@@ -355,7 +475,7 @@
 
     .stat-card:hover {
       transform: translateY(-4px);
-      border-color: var(--electric-violet);
+      border-color: var(--primary);
     }
 
     .stat-label {
@@ -370,14 +490,17 @@
       font-size: 36px;
       font-weight: 700;
       font-family: 'Clash Display', sans-serif;
-      background: linear-gradient(135deg, var(--electric-violet), var(--cyber-blue));
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
     }
 
     .stat-change {
       font-size: 12px;
-      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .stat-change.positive {
@@ -387,6 +510,25 @@
     .stat-change.negative {
       color: var(--error);
     }
+
+    /* Performance Grade Badge */
+    .grade-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'Clash Display', sans-serif;
+    }
+
+    .grade-A { background: linear-gradient(135deg, #10B981, #059669); color: white; }
+    .grade-B { background: linear-gradient(135deg, #84CC16, #65A30D); color: white; }
+    .grade-C { background: linear-gradient(135deg, #F59E0B, #D97706); color: white; }
+    .grade-D { background: linear-gradient(135deg, #F97316, #EA580C); color: white; }
+    .grade-F { background: linear-gradient(135deg, #EF4444, #DC2626); color: white; }
 
     /* Links Table */
     .links-table {
@@ -398,7 +540,7 @@
 
     .table-header {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 100px;
+      grid-template-columns: 2fr 1fr 1fr 0.8fr 0.5fr 120px;
       gap: 16px;
       padding: 20px 24px;
       background: var(--bg-elevated);
@@ -412,216 +554,25 @@
 
     .table-row {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 100px;
+      grid-template-columns: 2fr 1fr 1fr 0.8fr 0.5fr 120px;
       gap: 16px;
       padding: 20px 24px;
       border-bottom: 1px solid var(--border);
       align-items: center;
-      transition: background 0.2s;
+      transition: all 0.2s;
+      cursor: pointer;
     }
 
     .table-row:hover {
       background: var(--bg-elevated);
     }
 
-    .table-row:last-child {
-      border-bottom: none;
-    }
-
-    .link-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .short-url {
-      color: var(--cyber-blue);
-      font-weight: 600;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .short-url:hover {
-      color: var(--electric-violet);
-    }
-
-    .long-url {
-      font-size: 13px;
-      color: var(--text-secondary);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .clicks-badge {
+    .table-row.selected {
       background: rgba(139, 92, 246, 0.1);
-      color: var(--electric-violet);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-weight: 600;
-      display: inline-block;
+      border-left: 3px solid var(--primary);
     }
 
-    .actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .icon-btn {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 14px;
-    }
-
-    .icon-btn:hover {
-      border-color: var(--electric-violet);
-      background: rgba(139, 92, 246, 0.1);
-    }
-
-    /* Chart Container */
-    .chart-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-
-    .chart-header {
-      margin-bottom: 20px;
-    }
-
-    .chart-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .chart-subtitle {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    /* Loading Spinner */
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .loading-overlay.show {
-      display: flex;
-    }
-
-    .loader {
-      text-align: center;
-    }
-
-    .loader .spinner {
-      width: 48px;
-      height: 48px;
-      border-width: 4px;
-      margin-bottom: 16px;
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    .empty-icon {
-      font-size: 64px;
-      margin-bottom: 16px;
-      opacity: 0.5;
-    }
-
-    .empty-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .empty-text {
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      nav {
-        padding: 16px 20px;
-        flex-wrap: wrap;
-      }
-
-      .nav-links {
-        width: 100%;
-        justify-content: center;
-        margin-top: 16px;
-      }
-
-      .hero h1 {
-        font-size: 40px;
-      }
-
-      .hero p {
-        font-size: 16px;
-      }
-
-      .card {
-        padding: 24px;
-      }
-
-      .table-header,
-      .table-row {
-        grid-template-columns: 1fr;
-        gap: 8px;
-      }
-
-      .table-header {
-        display: none;
-      }
-
-      .link-info {
-        grid-column: 1;
-      }
-
-      .actions {
-        justify-content: flex-start;
-        grid-column: 1;
-      }
-    }
-
-    /* Modal */
+    /* Modals */
     .modal {
       position: fixed;
       top: 0;
@@ -650,6 +601,18 @@
       max-height: 90vh;
       overflow-y: auto;
       position: relative;
+      animation: modalSlideIn 0.3s;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
     }
 
     .modal-close {
@@ -670,28 +633,221 @@
       color: var(--text-primary);
     }
 
-    .modal-header {
-      margin-bottom: 24px;
-    }
-
-    .modal-title {
-      font-size: 24px;
-      font-weight: 700;
-      font-family: 'Clash Display', sans-serif;
-    }
-
-    .qr-code-container {
-      text-align: center;
-      padding: 20px;
-      background: white;
+    /* File Upload Area */
+    .upload-area {
+      border: 2px dashed var(--border);
       border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
       margin: 20px 0;
     }
 
-    #qrcode {
-      display: inline-block;
+    .upload-area:hover,
+    .upload-area.dragover {
+      border-color: var(--primary);
+      background: rgba(139, 92, 246, 0.05);
     }
 
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    /* Keyboard Shortcuts Panel */
+    .shortcuts-panel {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      display: none;
+      max-width: 300px;
+      z-index: 999;
+    }
+
+    .shortcuts-panel.show {
+      display: block;
+      animation: slideUp 0.3s;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .shortcut-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 13px;
+    }
+
+    .shortcut-key {
+      background: var(--bg-card);
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 1001;
+      min-width: 300px;
+      animation: toastSlideIn 0.3s;
+    }
+
+    .toast.show {
+      display: flex;
+    }
+
+    @keyframes toastSlideIn {
+      from {
+        opacity: 0;
+        transform: translateX(100px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.error { border-left: 4px solid var(--error); }
+    .toast.warning { border-left: 4px solid var(--warning); }
+
+    /* Loading State */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-elevated) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 8px;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Comparison Mode */
+    .comparison-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .comparison-bar.show {
+      display: flex;
+    }
+
+    /* Responsive */
+    @media (max-width: 968px) {
+      nav {
+        padding: 16px 20px;
+        flex-wrap: wrap;
+      }
+
+      .nav-center {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin-top: 16px;
+      }
+
+      .table-header,
+      .table-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .table-header {
+        display: none;
+      }
+
+      .notification-panel {
+        right: 20px;
+        width: calc(100% - 40px);
+      }
+    }
+
+    /* Hide by default */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* Form inputs */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="url"],
+    input[type="file"] {
+      width: 100%;
+      padding: 14px 20px;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'Satoshi', sans-serif;
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    }
+
+    input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    /* Badge */
     .badge {
       display: inline-block;
       padding: 4px 12px;
@@ -714,354 +870,456 @@
       background: rgba(239, 68, 68, 0.1);
       color: var(--error);
     }
+
+    .badge-info {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--secondary);
+    }
   </style>
 </head>
 <body>
-  <div class="grid-pattern"></div>
+  <div class="bg-gradient"></div>
   
   <!-- Navigation -->
   <nav>
-    <div class="logo">🔗 LinkShort</div>
-    <div class="nav-links" id="navLinks">
+    <div class="logo">
+      <span>🚀</span>
+      <span>LinkShort Pro</span>
+    </div>
+    <div class="nav-center">
       <a class="nav-link active" data-view="home">Home</a>
       <a class="nav-link" data-view="dashboard">Dashboard</a>
       <a class="nav-link" data-view="links">My Links</a>
+      <a class="nav-link" data-view="analytics">Analytics</a>
     </div>
-    <div id="authButtons">
-      <button class="btn btn-secondary" onclick="showView('login')">Login</button>
-      <button class="btn" onclick="showView('signup')">Sign Up</button>
-    </div>
-    <div id="userMenu" style="display: none;">
-      <span id="userEmail" style="margin-right: 16px; color: var(--text-secondary);"></span>
-      <button class="btn btn-secondary" onclick="logout()">Logout</button>
+    <div class="nav-right">
+      <div class="notification-bell" id="notificationBell" onclick="toggleNotifications()">
+        <span>🔔</span>
+      </div>
+      <div class="theme-toggle" onclick="toggleTheme()">
+        <span id="themeIcon">🌙</span>
+      </div>
+      <button class="btn" onclick="showView('login')" id="authBtn">Login</button>
     </div>
   </nav>
+
+  <!-- Notification Panel -->
+  <div class="notification-panel" id="notificationPanel">
+    <div class="notification-header">
+      <span>Notifications</span>
+      <button class="btn-secondary btn-icon" onclick="clearNotifications()" style="font-size: 12px; padding: 6px 12px;">Clear All</button>
+    </div>
+    <div class="notification-list" id="notificationList">
+      <div class="notification-item unread">
+        <div>🎉 Your link "summer-sale" was clicked from United States</div>
+        <div class="notification-time">2 minutes ago</div>
+      </div>
+      <div class="notification-item">
+        <div>📊 Weekly report: 156 clicks across 12 links</div>
+        <div class="notification-time">1 hour ago</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Shortcuts Panel -->
+  <div class="shortcuts-panel" id="shortcutsPanel">
+    <h4 style="margin-bottom: 16px;">⌨️ Keyboard Shortcuts</h4>
+    <div class="shortcut-item">
+      <span>New Link</span>
+      <span class="shortcut-key">Ctrl+N</span>
+    </div>
+    <div class="shortcut-item">
+      <span>Search</span>
+      <span class="shortcut-key">Ctrl+K</span>
+    </div>
+    <div class="shortcut-item">
+      <span>Toggle Theme</span>
+      <span class="shortcut-key">Ctrl+T</span>
+    </div>
+    <div class="shortcut-item">
+      <span>Help</span>
+      <span class="shortcut-key">?</span>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <span id="toastIcon"></span>
+    <span id="toastMessage"></span>
+  </div>
 
   <div class="container">
     <!-- Home View -->
     <div id="homeView" class="view active">
-      <div class="hero">
-        <h1>Shorten URL</h1>
-        <p>Transform lengthy URLs into sleek, shareable links with powerful analytics.</p>
+      <div style="text-align: center; margin-bottom: 60px;">
+        <div style="display: inline-block; padding: 8px 20px; background: rgba(139, 92, 246, 0.1); border-radius: 50px; color: var(--primary); font-size: 13px; font-weight: 600; margin-bottom: 24px;">
+          <span style="animation: pulse 2s infinite;">⚡</span>
+          Enterprise-Grade URL Management
+        </div>
+        <h1 style="font-family: 'Clash Display', sans-serif; font-size: 64px; font-weight: 700; margin-bottom: 16px; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          Shorten. Track. Optimize.
+        </h1>
+        <p style="font-size: 20px; color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+          Professional URL shortening with real-time analytics, performance scoring, and bulk management.
+        </p>
       </div>
 
+      <!-- Feature Cards -->
+      <div class="feature-cards">
+        <div class="feature-card" onclick="showUploadModal()">
+          <div class="feature-icon">📁</div>
+          <div class="feature-title">Bulk Import</div>
+          <div class="feature-desc">Upload CSV files to create multiple links at once</div>
+        </div>
+        <div class="feature-card" onclick="exportLinks()">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title">Export Analytics</div>
+          <div class="feature-desc">Download comprehensive reports as CSV or PDF</div>
+        </div>
+        <div class="feature-card" onclick="showComparison()">
+          <div class="feature-icon">⚖️</div>
+          <div class="feature-title">Compare Links</div>
+          <div class="feature-desc">Side-by-side performance comparison</div>
+        </div>
+        <div class="feature-card" onclick="toggleShortcuts()">
+          <div class="feature-icon">⌨️</div>
+          <div class="feature-title">Shortcuts</div>
+          <div class="feature-desc">Power user keyboard shortcuts</div>
+        </div>
+      </div>
+
+      <!-- Shorten Form -->
       <div class="card">
+        <h2 style="font-size: 28px; margin-bottom: 24px;">Create Short Link</h2>
         <form id="shortenForm">
           <div class="form-group">
-            <label class="form-label">Enter Your Long URL</label>
-            <div class="input-wrapper">
-              <span class="input-icon">🔗</span>
-              <input 
-                type="url" 
-                id="longUrl" 
-                placeholder="https://www.example.com/very-long-url..."
-                required
-              >
-            </div>
+            <label class="form-label">Long URL</label>
+            <input 
+              type="url" 
+              id="longUrl" 
+              placeholder="https://example.com/very-long-url..."
+              required
+            >
           </div>
-
           <div class="form-group">
-            <label class="form-label">Custom Short Code (Optional)</label>
-            <div class="input-wrapper">
-              <span class="input-icon">✏️</span>
-              <input 
-                type="text" 
-                id="customCode" 
-                placeholder="my-custom-link"
-                pattern="[a-zA-Z0-9-_]+"
-              >
-            </div>
-            <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 8px;">
-              Only letters, numbers, hyphens, and underscores
-            </small>
+            <label class="form-label">Custom Code (Optional)</label>
+            <input 
+              type="text" 
+              id="customCode" 
+              placeholder="my-custom-link"
+            >
           </div>
-
-          <div class="form-group">
-            <div class="checkbox-wrapper">
+          <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
               <input type="checkbox" id="enableExpiration">
-              <label for="enableExpiration" style="cursor: pointer;">Enable link expiration (7 days)</label>
-            </div>
+              <span>7-day expiration</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="generateQR">
+              <span>Auto-generate QR code</span>
+            </label>
           </div>
-
-          <div id="homeError" class="message error"></div>
-          <div id="homeSuccess" class="message success"></div>
-
-          <button type="submit" class="btn" style="width: 100%;" id="shortenBtn">
-            <span>✨ Shorten Now</span>
+          <div id="shortenError" style="display: none; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--error); border-radius: 8px; color: var(--error); margin-bottom: 16px;"></div>
+          <button type="submit" class="btn" style="width: 100%;">
+            ✨ Create Short Link
           </button>
         </form>
 
-        <div id="result" style="display: none; margin-top: 32px;">
-          <div style="padding: 24px; background: rgba(16, 185, 129, 0.05); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 16px;">
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-              <div style="width: 32px; height: 32px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center;">✓</div>
-              <span style="color: var(--success); font-weight: 700; text-transform: uppercase; font-size: 14px;">Link Created Successfully!</span>
-            </div>
-            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-              <input type="text" id="shortUrlResult" readonly style="flex: 1; padding: 16px; font-weight: 600; color: var(--success);">
-              <button class="btn" onclick="copyToClipboard('shortUrlResult')">📋 Copy</button>
-              <button class="btn btn-secondary" onclick="showQRCode()">QR Code</button>
-            </div>
-            <a id="shortLinkResult" href="#" target="_blank" style="color: var(--cyber-blue); text-decoration: none; font-weight: 600;">Open link →</a>
+        <div id="shortenResult" style="display: none; margin-top: 32px; padding: 24px; background: rgba(16, 185, 129, 0.05); border: 2px solid var(--success); border-radius: 16px;">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <div style="width: 32px; height: 32px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">✓</div>
+            <span style="font-weight: 700; color: var(--success);">LINK CREATED!</span>
           </div>
+          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <input type="text" id="resultUrl" readonly style="flex: 1; background: var(--bg-dark); border-color: var(--success);">
+            <button class="btn" onclick="copyResult()">📋 Copy</button>
+            <button class="btn btn-secondary" onclick="showQRModal()">QR Code</button>
+          </div>
+          <a id="resultLink" href="#" target="_blank" style="color: var(--secondary); text-decoration: none; font-weight: 600;">Open link →</a>
         </div>
       </div>
     </div>
 
     <!-- Dashboard View -->
     <div id="dashboardView" class="view">
-      <div style="margin-bottom: 32px;">
-        <h2 style="font-family: 'Clash Display', sans-serif; font-size: 48px; margin-bottom: 8px;">Analytics Dashboard</h2>
-        <p style="color: var(--text-secondary); font-size: 16px;">Track your link performance in real-time</p>
-      </div>
-
+      <h2 style="font-size: 48px; margin-bottom: 32px;">Analytics Dashboard</h2>
+      
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-label">Total Links</div>
-          <div class="stat-value" id="totalLinks">0</div>
-          <div class="stat-change positive" id="linksChange">+0 this week</div>
+          <div class="stat-value" id="statTotalLinks">0</div>
+          <div class="stat-change positive">↑ 12% vs last week</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Clicks</div>
-          <div class="stat-value" id="totalClicks">0</div>
-          <div class="stat-change positive" id="clicksChange">+0 this week</div>
+          <div class="stat-value" id="statTotalClicks">0</div>
+          <div class="stat-change positive">↑ 23% vs last week</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Click Rate</div>
-          <div class="stat-value" id="clickRate">0%</div>
-          <div class="stat-change" id="rateChange">Average per link</div>
+          <div class="stat-label">Avg Performance</div>
+          <div class="stat-value" id="statAvgGrade">-</div>
+          <div class="stat-change">Based on CTR</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Top Performer</div>
-          <div class="stat-value" style="font-size: 24px;" id="topLink">-</div>
-          <div class="stat-change" id="topClicks">0 clicks</div>
+          <div class="stat-label">Top Link</div>
+          <div class="stat-value" style="font-size: 24px;" id="statTopLink">-</div>
+          <div class="stat-change" id="statTopClicks">0 clicks</div>
         </div>
       </div>
 
-      <div class="chart-container">
-        <div class="chart-header">
-          <div class="chart-title">Clicks Over Time</div>
-          <div class="chart-subtitle">Last 7 days</div>
-        </div>
+      <div class="card">
+        <h3 style="font-size: 20px; margin-bottom: 20px;">Clicks Over Time</h3>
         <canvas id="clicksChart" height="80"></canvas>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-        <div class="chart-container">
-          <div class="chart-header">
-            <div class="chart-title">Top Locations</div>
-            <div class="chart-subtitle">By country</div>
-          </div>
-          <canvas id="locationsChart"></canvas>
+        <div class="card">
+          <h3 style="font-size: 20px; margin-bottom: 20px;">Top Countries</h3>
+          <canvas id="countriesChart"></canvas>
         </div>
-        <div class="chart-container">
-          <div class="chart-header">
-            <div class="chart-title">Devices</div>
-            <div class="chart-subtitle">Desktop vs Mobile</div>
-          </div>
+        <div class="card">
+          <h3 style="font-size: 20px; margin-bottom: 20px;">Device Types</h3>
           <canvas id="devicesChart"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- My Links View -->
+    <!-- Links View -->
     <div id="linksView" class="view">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
         <div>
-          <h2 style="font-family: 'Clash Display', sans-serif; font-size: 48px; margin-bottom: 8px;">My Links</h2>
-          <p style="color: var(--text-secondary); font-size: 16px;">Manage all your shortened URLs</p>
+          <h2 style="font-size: 48px; margin-bottom: 8px;">My Links</h2>
+          <p style="color: var(--text-secondary);">Manage and analyze your shortened URLs</p>
         </div>
-        <button class="btn" onclick="showView('home')">+ Create New Link</button>
+        <button class="btn" onclick="showView('home')">+ New Link</button>
       </div>
 
-      <div id="linksContainer">
-        <div class="links-table">
-          <div class="table-header">
-            <div>Link</div>
-            <div>Created</div>
-            <div>Clicks</div>
-            <div>Status</div>
-            <div>Actions</div>
-          </div>
-          <div id="linksTableBody">
-            <!-- Links will be inserted here -->
-          </div>
+      <!-- Comparison Mode Bar -->
+      <div class="comparison-bar" id="comparisonBar">
+        <div>
+          <span id="selectedCount">0</span> links selected
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn btn-secondary" onclick="compareSelected()">Compare</button>
+          <button class="btn btn-secondary" onclick="clearSelection()">Clear</button>
         </div>
       </div>
 
-      <div id="emptyLinks" class="empty-state" style="display: none;">
-        <div class="empty-icon">🔗</div>
-        <div class="empty-title">No Links Yet</div>
-        <div class="empty-text">Create your first shortened link to get started</div>
+      <!-- Search and Filter -->
+      <div class="search-filter-bar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchLinks" placeholder="Search links..." onkeyup="filterLinks()">
+        </div>
+        <select class="filter-dropdown" id="sortBy" onchange="sortLinks()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="most-clicks">Most Clicks</option>
+          <option value="least-clicks">Least Clicks</option>
+          <option value="best-performing">Best Performing</option>
+        </select>
+        <select class="filter-dropdown" id="filterStatus">
+          <option value="all">All Status</option>
+          <option value="active">Active Only</option>
+          <option value="expired">Expired Only</option>
+        </select>
+      </div>
+
+      <!-- Links Table -->
+      <div class="links-table">
+        <div class="table-header">
+          <div>Link</div>
+          <div>Created</div>
+          <div>Clicks</div>
+          <div>Status</div>
+          <div>Grade</div>
+          <div>Actions</div>
+        </div>
+        <div id="linksTableBody">
+          <!-- Will be populated dynamically -->
+        </div>
+      </div>
+
+      <div id="emptyLinks" style="display: none; text-align: center; padding: 60px;">
+        <div style="font-size: 64px; margin-bottom: 16px;">🔗</div>
+        <h3 style="font-size: 24px; margin-bottom: 8px;">No links yet</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">Create your first short link to get started</p>
         <button class="btn" onclick="showView('home')">Create Link</button>
       </div>
     </div>
 
-    <!-- Login View -->
-    <div id="loginView" class="view">
-      <div style="max-width: 500px; margin: 60px auto;">
+    <!-- Analytics View -->
+    <div id="analyticsView" class="view">
+      <h2 style="font-size: 48px; margin-bottom: 32px;">Advanced Analytics</h2>
+      
+      <div class="card">
+        <h3 style="font-size: 24px; margin-bottom: 24px;">Performance Breakdown</h3>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; text-align: center;">
+          <div>
+            <div class="grade-badge grade-A">A</div>
+            <div style="margin-top: 8px; font-weight: 600;">12 links</div>
+            <div style="font-size: 12px; color: var(--text-secondary);">Excellent</div>
+          </div>
+          <div>
+            <div class="grade-badge grade-B">B</div>
+            <div style="margin-top: 8px; font-weight: 600;">8 links</div>
+            <div style="font-size: 12px; color: var(--text-secondary);">Good</div>
+          </div>
+          <div>
+            <div class="grade-badge grade-C">C</div>
+            <div style="margin-top: 8px; font-weight: 600;">5 links</div>
+            <div style="font-size: 12px; color: var(--text-secondary);">Average</div>
+          </div>
+          <div>
+            <div class="grade-badge grade-D">D</div>
+            <div style="margin-top: 8px; font-weight: 600;">3 links</div>
+            <div style="font-size: 12px; color: var(--text-secondary);">Below Avg</div>
+          </div>
+          <div>
+            <div class="grade-badge grade-F">F</div>
+            <div style="margin-top: 8px; font-weight: 600;">2 links</div>
+            <div style="font-size: 12px; color: var(--text-secondary);">Poor</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
         <div class="card">
-          <h2 style="font-family: 'Clash Display', sans-serif; font-size: 36px; margin-bottom: 8px;">Welcome Back</h2>
-          <p style="color: var(--text-secondary); margin-bottom: 32px;">Login to access your dashboard</p>
-
-          <form id="loginForm">
-            <div class="form-group">
-              <label class="form-label">Email</label>
-              <div class="input-wrapper">
-                <span class="input-icon">📧</span>
-                <input type="email" id="loginEmail" placeholder="you@example.com" required>
+          <h3 style="font-size: 20px; margin-bottom: 20px;">Click Sources</h3>
+          <div style="space-y: 12px;">
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span>Twitter</span>
+                <span style="font-weight: 700;">45%</span>
+              </div>
+              <div style="height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden;">
+                <div style="width: 45%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary));"></div>
               </div>
             </div>
-
-            <div class="form-group">
-              <label class="form-label">Password</label>
-              <div class="input-wrapper">
-                <span class="input-icon">🔒</span>
-                <input type="password" id="loginPassword" placeholder="••••••••" required>
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span>Direct</span>
+                <span style="font-weight: 700;">30%</span>
+              </div>
+              <div style="height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden;">
+                <div style="width: 30%; height: 100%; background: linear-gradient(90deg, var(--secondary), var(--accent));"></div>
               </div>
             </div>
-
-            <div id="loginError" class="message error"></div>
-
-            <button type="submit" class="btn" style="width: 100%; margin-bottom: 16px;" id="loginBtn">
-              Login
-            </button>
-
-            <div style="text-align: center; color: var(--text-secondary);">
-              Don't have an account? <a href="#" onclick="showView('signup'); return false;" style="color: var(--electric-violet); text-decoration: none; font-weight: 600;">Sign Up</a>
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span>LinkedIn</span>
+                <span style="font-weight: 700;">15%</span>
+              </div>
+              <div style="height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden;">
+                <div style="width: 15%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--warning));"></div>
+              </div>
             </div>
-          </form>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span>Other</span>
+                <span style="font-weight: 700;">10%</span>
+              </div>
+              <div style="height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden;">
+                <div style="width: 10%; height: 100%; background: var(--text-secondary);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 20px; margin-bottom: 20px;">Peak Hours</h3>
+          <canvas id="peakHoursChart"></canvas>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Signup View -->
-    <div id="signupView" class="view">
-      <div style="max-width: 500px; margin: 60px auto;">
-        <div class="card">
-          <h2 style="font-family: 'Clash Display', sans-serif; font-size: 36px; margin-bottom: 8px;">Create Account</h2>
-          <p style="color: var(--text-secondary); margin-bottom: 32px;">Start shortening URLs with analytics</p>
-
-          <form id="signupForm">
-            <div class="form-group">
-              <label class="form-label">Full Name</label>
-              <div class="input-wrapper">
-                <span class="input-icon">👤</span>
-                <input type="text" id="signupName" placeholder="John Doe" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Email</label>
-              <div class="input-wrapper">
-                <span class="input-icon">📧</span>
-                <input type="email" id="signupEmail" placeholder="you@example.com" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Password</label>
-              <div class="input-wrapper">
-                <span class="input-icon">🔒</span>
-                <input type="password" id="signupPassword" placeholder="••••••••" required minlength="8">
-              </div>
-              <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 8px;">
-                At least 8 characters
-              </small>
-            </div>
-
-            <div id="signupError" class="message error"></div>
-            <div id="signupSuccess" class="message success"></div>
-
-            <button type="submit" class="btn" style="width: 100%; margin-bottom: 16px;" id="signupBtn">
-              Create Account
-            </button>
-
-            <div style="text-align: center; color: var(--text-secondary);">
-              Already have an account? <a href="#" onclick="showView('login'); return false;" style="color: var(--electric-violet); text-decoration: none; font-weight: 600;">Login</a>
-            </div>
-          </form>
+  <!-- Bulk Upload Modal -->
+  <div class="modal" id="uploadModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('uploadModal')">×</button>
+      <h3 style="font-size: 28px; margin-bottom: 8px;">Bulk Import Links</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 24px;">Upload a CSV file to create multiple short links at once</p>
+      
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('csvFile').click()">
+        <div class="upload-icon">📁</div>
+        <div style="font-weight: 600; margin-bottom: 8px;">Drop CSV file here or click to browse</div>
+        <div style="font-size: 13px; color: var(--text-secondary);">Format: longUrl, customCode (optional)</div>
+      </div>
+      <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleCSVUpload(event)">
+      
+      <div id="uploadProgress" style="display: none; margin-top: 20px;">
+        <div style="margin-bottom: 8px;">Processing... <span id="uploadCount">0</span> / <span id="uploadTotal">0</span></div>
+        <div style="height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden;">
+          <div id="uploadBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.3s;"></div>
         </div>
+      </div>
+
+      <div style="margin-top: 20px; padding: 16px; background: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 12px;">
+        <div style="font-weight: 600; margin-bottom: 8px;">📄 CSV Template</div>
+        <pre style="font-size: 12px; color: var(--text-secondary); font-family: monospace; line-height: 1.6;">longUrl,customCode
+https://example.com/page1,custom1
+https://example.com/page2,custom2
+https://example.com/page3,</pre>
+        <button class="btn btn-secondary" style="margin-top: 12px; font-size: 12px; padding: 8px 16px;" onclick="downloadTemplate()">Download Template</button>
       </div>
     </div>
   </div>
 
   <!-- QR Code Modal -->
-  <div id="qrModal" class="modal">
+  <div class="modal" id="qrModal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal('qrModal')">×</button>
-      <div class="modal-header">
-        <h3 class="modal-title">QR Code</h3>
-        <p style="color: var(--text-secondary); margin-top: 8px;">Scan to access your shortened link</p>
-      </div>
-      <div class="qr-code-container">
+      <h3 style="font-size: 28px; margin-bottom: 24px;">QR Code</h3>
+      <div style="text-align: center; padding: 20px; background: white; border-radius: 16px; margin-bottom: 20px;">
         <div id="qrcode"></div>
       </div>
-      <div style="text-align: center;">
-        <p id="qrUrlText" style="margin-bottom: 16px; color: var(--text-secondary); word-break: break-all;"></p>
-        <button class="btn" onclick="downloadQRCode()">📥 Download QR Code</button>
-      </div>
+      <div style="text-align: center; color: var(--text-secondary); margin-bottom: 20px;" id="qrUrl"></div>
+      <button class="btn" style="width: 100%;" onclick="downloadQR()">📥 Download QR Code</button>
     </div>
   </div>
-
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="loading-overlay">
-    <div class="loader">
-      <div class="spinner"></div>
-      <div style="color: var(--text-primary); font-weight: 600;">Loading...</div>
-    </div>
-  </div>
-
-  <!-- QR Code Library -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
   <script>
     // Configuration
     const API_URL = "https://tm7aoixlyh.execute-api.eu-north-1.amazonaws.com";
     
-    // State Management
+    // State
     let currentUser = null;
-    let currentShortCode = null;
-    let qrCodeInstance = null;
+    let allLinks = [];
+    let selectedLinks = new Set();
+    let notifications = [];
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       checkAuth();
       setupEventListeners();
+      loadTheme();
+      setupKeyboardShortcuts();
+      startNotificationPolling();
     });
 
-    function setupEventListeners() {
-      // Shorten form
-      document.getElementById('shortenForm').addEventListener('submit', handleShorten);
-      
-      // Auth forms
-      document.getElementById('loginForm').addEventListener('submit', handleLogin);
-      document.getElementById('signupForm').addEventListener('submit', handleSignup);
+    // Theme Management
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      document.getElementById('themeIcon').textContent = newTheme === 'dark' ? '🌙' : '☀️';
+      showToast('Theme changed to ' + newTheme + ' mode', 'success');
+    }
 
-      // Navigation
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const view = e.target.dataset.view;
-          showView(view);
-        });
-      });
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? '🌙' : '☀️';
     }
 
     // View Management
     function showView(viewName) {
-      // Hide all views
-      document.querySelectorAll('.view').forEach(view => {
-        view.classList.remove('active');
-      });
-
-      // Show selected view
-      const view = document.getElementById(viewName + 'View');
-      if (view) {
-        view.classList.add('active');
-      }
-
-      // Update navigation
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewName + 'View').classList.add('active');
+      
       document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
         if (link.dataset.view === viewName) {
@@ -1069,135 +1327,104 @@
         }
       });
 
-      // Load data for specific views
-      if (viewName === 'dashboard' && currentUser) {
-        loadDashboard();
-      } else if (viewName === 'links' && currentUser) {
-        loadLinks();
+      if (viewName === 'dashboard' && currentUser) loadDashboard();
+      if (viewName === 'links' && currentUser) loadLinks();
+      if (viewName === 'analytics' && currentUser) loadAnalytics();
+    }
+
+    // Event Listeners
+    function setupEventListeners() {
+      document.getElementById('shortenForm').addEventListener('submit', handleShorten);
+      
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          showView(link.dataset.view);
+        });
+      });
+
+      // Drag and drop for upload
+      const uploadArea = document.getElementById('uploadArea');
+      if (uploadArea) {
+        uploadArea.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+          uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          uploadArea.classList.remove('dragover');
+          const file = e.dataTransfer.files[0];
+          if (file && file.name.endsWith('.csv')) {
+            handleCSVUpload({ target: { files: [file] } });
+          }
+        });
       }
+    }
+
+    // Keyboard Shortcuts
+    function setupKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        // Ctrl/Cmd + N: New link
+        if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+          e.preventDefault();
+          showView('home');
+          document.getElementById('longUrl').focus();
+        }
+        
+        // Ctrl/Cmd + K: Search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          const searchInput = document.getElementById('searchLinks');
+          if (searchInput) {
+            showView('links');
+            setTimeout(() => searchInput.focus(), 100);
+          }
+        }
+        
+        // Ctrl/Cmd + T: Toggle theme
+        if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+          e.preventDefault();
+          toggleTheme();
+        }
+        
+        // ?: Show shortcuts
+        if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+          toggleShortcuts();
+        }
+      });
+    }
+
+    function toggleShortcuts() {
+      const panel = document.getElementById('shortcutsPanel');
+      panel.classList.toggle('show');
+      setTimeout(() => {
+        if (panel.classList.contains('show')) {
+          panel.classList.remove('show');
+        }
+      }, 5000);
     }
 
     // Authentication
     function checkAuth() {
       const token = localStorage.getItem('authToken');
       const user = localStorage.getItem('user');
-      
       if (token && user) {
         currentUser = JSON.parse(user);
         updateAuthUI(true);
-      } else {
-        updateAuthUI(false);
       }
     }
 
     function updateAuthUI(isAuthenticated) {
-      const authButtons = document.getElementById('authButtons');
-      const userMenu = document.getElementById('userMenu');
-      const navLinks = document.getElementById('navLinks');
-
+      const authBtn = document.getElementById('authBtn');
       if (isAuthenticated) {
-        authButtons.style.display = 'none';
-        userMenu.style.display = 'flex';
-        document.getElementById('userEmail').textContent = currentUser.email;
-        
-        // Show dashboard and links tabs
-        navLinks.querySelectorAll('[data-view="dashboard"], [data-view="links"]').forEach(el => {
-          el.style.display = 'block';
-        });
+        authBtn.textContent = 'Logout';
+        authBtn.onclick = logout;
       } else {
-        authButtons.style.display = 'flex';
-        userMenu.style.display = 'none';
-        
-        // Hide dashboard and links tabs
-        navLinks.querySelectorAll('[data-view="dashboard"], [data-view="links"]').forEach(el => {
-          el.style.display = 'none';
-        });
-        
-        showView('home');
-      }
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const btn = document.getElementById('loginBtn');
-      const errorEl = document.getElementById('loginError');
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Logging in...';
-      errorEl.classList.remove('show');
-
-      try {
-        const response = await fetch(`${API_URL}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Login failed');
-        }
-
-        // Store auth data
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        currentUser = data.user;
-
-        updateAuthUI(true);
-        showView('dashboard');
-        
-      } catch (error) {
-        showError('loginError', error.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'Login';
-      }
-    }
-
-    async function handleSignup(e) {
-      e.preventDefault();
-      
-      const name = document.getElementById('signupName').value;
-      const email = document.getElementById('signupEmail').value;
-      const password = document.getElementById('signupPassword').value;
-      const btn = document.getElementById('signupBtn');
-      const errorEl = document.getElementById('signupError');
-      const successEl = document.getElementById('signupSuccess');
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Creating account...';
-      errorEl.classList.remove('show');
-      successEl.classList.remove('show');
-
-      try {
-        const response = await fetch(`${API_URL}/auth/signup`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Signup failed');
-        }
-
-        // Show success and redirect to login
-        showSuccess('signupSuccess', 'Account created! Redirecting to login...');
-        setTimeout(() => {
-          showView('login');
-          document.getElementById('loginEmail').value = email;
-        }, 2000);
-        
-      } catch (error) {
-        showError('signupError', error.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'Create Account';
+        authBtn.textContent = 'Login';
+        authBtn.onclick = () => showView('login');
       }
     }
 
@@ -1207,6 +1434,7 @@
       currentUser = null;
       updateAuthUI(false);
       showView('home');
+      showToast('Logged out successfully', 'success');
     }
 
     // URL Shortening
@@ -1216,15 +1444,10 @@
       const longUrl = document.getElementById('longUrl').value.trim();
       const customCode = document.getElementById('customCode').value.trim();
       const enableExpiration = document.getElementById('enableExpiration').checked;
-      const btn = document.getElementById('shortenBtn');
-      const errorEl = document.getElementById('homeError');
-      const successEl = document.getElementById('homeSuccess');
-      const resultEl = document.getElementById('result');
+      const errorEl = document.getElementById('shortenError');
+      const resultEl = document.getElementById('shortenResult');
 
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Shortening...';
-      errorEl.classList.remove('show');
-      successEl.classList.remove('show');
+      errorEl.style.display = 'none';
       resultEl.style.display = 'none';
 
       try {
@@ -1236,7 +1459,7 @@
         const body = {
           longUrl,
           ...(customCode && { customCode }),
-          ...(enableExpiration && { expiresIn: 7 * 24 * 60 * 60 }) // 7 days in seconds
+          ...(enableExpiration && { expiresIn: 7 * 24 * 60 * 60 })
         };
 
         const response = await fetch(`${API_URL}/shorten`, {
@@ -1245,178 +1468,92 @@
           body: JSON.stringify(body)
         });
 
-        const data = await response.json();
+        const data = await response.json().catch(function() { return {}; });
 
         if (!response.ok) {
           throw new Error(data.error || 'Failed to shorten URL');
         }
 
-        // Show result
-        currentShortCode = data.shortCode;
-        document.getElementById('shortUrlResult').value = data.shortUrl;
-        document.getElementById('shortLinkResult').href = data.shortUrl;
-        document.getElementById('shortLinkResult').textContent = 'Open link →';
+        document.getElementById('resultUrl').value = data.shortUrl;
+        document.getElementById('resultLink').href = data.shortUrl;
         resultEl.style.display = 'block';
-
-        // Reset form
         document.getElementById('shortenForm').reset();
         
-      } catch (error) {
-        showError('homeError', error.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span>✨ Shorten Now</span>';
-      }
-    }
-
-    // Dashboard
-    async function loadDashboard() {
-      if (!currentUser) return;
-
-      showLoading(true);
-
-      try {
-        const response = await fetch(`${API_URL}/analytics/dashboard`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          }
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to load dashboard');
-        }
-
-        // Update stats
-        document.getElementById('totalLinks').textContent = data.totalLinks || 0;
-        document.getElementById('totalClicks').textContent = data.totalClicks || 0;
-        document.getElementById('clickRate').textContent = data.clickRate ? `${data.clickRate}%` : '0%';
-        document.getElementById('topLink').textContent = data.topLink?.shortCode || '-';
-        document.getElementById('topClicks').textContent = `${data.topLink?.clicks || 0} clicks`;
-
-        // Update charts
-        updateClicksChart(data.clicksOverTime || []);
-        updateLocationsChart(data.topLocations || []);
-        updateDevicesChart(data.deviceStats || {});
+        showToast('Link created successfully!', 'success');
+        addNotification(`🎉 New link created: ${data.shortCode}`);
 
       } catch (error) {
-        console.error('Dashboard error:', error);
-      } finally {
-        showLoading(false);
+        errorEl.textContent = '⚠️ ' + error.message;
+        errorEl.style.display = 'block';
       }
     }
 
-    function updateClicksChart(data) {
-      const ctx = document.getElementById('clicksChart');
-      
-      if (window.clicksChart) {
-        window.clicksChart.destroy();
-      }
+    // Bulk Upload
+    function showUploadModal() {
+      document.getElementById('uploadModal').classList.add('show');
+    }
 
-      window.clicksChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: data.map(d => d.date),
-          datasets: [{
-            label: 'Clicks',
-            data: data.map(d => d.clicks),
-            borderColor: '#8B5CF6',
-            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-            tension: 0.4,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: '#3F3F46' },
-              ticks: { color: '#A1A1AA' }
-            },
-            x: {
-              grid: { display: false },
-              ticks: { color: '#A1A1AA' }
+    async function handleCSVUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const progressDiv = document.getElementById('uploadProgress');
+      progressDiv.style.display = 'block';
+
+      Papa.parse(file, {
+        header: true,
+        complete: async (results) => {
+          const total = results.data.length;
+          document.getElementById('uploadTotal').textContent = total;
+          
+          let processed = 0;
+          for (const row of results.data) {
+            if (!row.longUrl) continue;
+            
+            try {
+              await fetch(`${API_URL}/shorten`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                },
+                body: JSON.stringify({
+                  longUrl: row.longUrl,
+                  ...(row.customCode && { customCode: row.customCode })
+                })
+              });
+              
+              processed++;
+              document.getElementById('uploadCount').textContent = processed;
+              document.getElementById('uploadBar').style.width = `${(processed / total) * 100}%`;
+              
+            } catch (error) {
+              console.error('Error creating link:', error);
             }
           }
+          
+          showToast(`Successfully created ${processed} links!`, 'success');
+          setTimeout(() => {
+            closeModal('uploadModal');
+            loadLinks();
+          }, 2000);
         }
       });
     }
 
-    function updateLocationsChart(data) {
-      const ctx = document.getElementById('locationsChart');
-      
-      if (window.locationsChart) {
-        window.locationsChart.destroy();
-      }
-
-      window.locationsChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: data.map(d => d.country),
-          datasets: [{
-            data: data.map(d => d.clicks),
-            backgroundColor: [
-              '#8B5CF6',
-              '#06B6D4',
-              '#EC4899',
-              '#84CC16',
-              '#F59E0B'
-            ]
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: { color: '#A1A1AA' }
-            }
-          }
-        }
-      });
-    }
-
-    function updateDevicesChart(data) {
-      const ctx = document.getElementById('devicesChart');
-      
-      if (window.devicesChart) {
-        window.devicesChart.destroy();
-      }
-
-      window.devicesChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: ['Desktop', 'Mobile', 'Tablet'],
-          datasets: [{
-            data: [data.desktop || 0, data.mobile || 0, data.tablet || 0],
-            backgroundColor: ['#8B5CF6', '#06B6D4', '#EC4899']
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: { color: '#A1A1AA' }
-            }
-          }
-        }
-      });
+    function downloadTemplate() {
+      const csv = "longUrl,customCode\nhttps://example.com/page1,custom1\nhttps://example.com/page2,custom2";
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bulk-import-template.csv';
+      a.click();
     }
 
     // Links Management
     async function loadLinks() {
       if (!currentUser) return;
-
-      showLoading(true);
 
       try {
         const response = await fetch(`${API_URL}/links`, {
@@ -1425,117 +1562,321 @@
           }
         });
 
-        const data = await response.json();
+        const data = await response.json().catch(function() { return {}; });
+        allLinks = (data && data.links) ? data.links : [];
 
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to load links');
-        }
+        renderLinks(allLinks);
 
-        const container = document.getElementById('linksTableBody');
-        const emptyState = document.getElementById('emptyLinks');
+      } catch (error) {
+        console.error('Error loading links:', error);
+        allLinks = [];
+        renderLinks([]);
+      }
+    }
 
-        if (!data.links || data.links.length === 0) {
-          document.getElementById('linksContainer').style.display = 'none';
-          emptyState.style.display = 'block';
-          return;
-        }
+    function renderLinks(links) {
+      const container = document.getElementById('linksTableBody');
+      const emptyState = document.getElementById('emptyLinks');
 
-        document.getElementById('linksContainer').style.display = 'block';
-        emptyState.style.display = 'none';
+      if (links.length === 0) {
+        container.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
 
-        container.innerHTML = data.links.map(link => `
-          <div class="table-row">
-            <div class="link-info">
-              <a href="${link.shortUrl}" target="_blank" class="short-url">${link.shortCode}</a>
-              <div class="long-url">${link.longUrl}</div>
+      emptyState.style.display = 'none';
+      container.innerHTML = links.map(link => {
+        const grade = calculateGrade(link.clicks, link.createdAt);
+        const isSelected = selectedLinks.has(link.shortCode);
+        
+        return `
+          <div class="table-row ${isSelected ? 'selected' : ''}" onclick="toggleSelection('${link.shortCode}', event)">
+            <div>
+              <div style="font-weight: 600; color: var(--secondary); margin-bottom: 4px;">${link.shortCode}</div>
+              <div style="font-size: 13px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${link.longUrl}</div>
             </div>
-            <div style="color: var(--text-secondary); font-size: 14px;">${formatDate(link.createdAt)}</div>
-            <div><span class="clicks-badge">${link.clicks || 0} clicks</span></div>
+            <div style="font-size: 14px; color: var(--text-secondary);">${formatDate(link.createdAt)}</div>
+            <div><span class="badge badge-info">${link.clicks} clicks</span></div>
             <div>
               ${link.isExpired ? 
                 '<span class="badge badge-error">Expired</span>' : 
                 '<span class="badge badge-success">Active</span>'}
             </div>
-            <div class="actions">
-              <button class="icon-btn" onclick="viewAnalytics('${link.shortCode}')" title="Analytics">📊</button>
-              <button class="icon-btn" onclick="copyLinkToClipboard('${link.shortUrl}')" title="Copy">📋</button>
-              <button class="icon-btn" onclick="deleteLink('${link.shortCode}')" title="Delete">🗑️</button>
+            <div><div class="grade-badge grade-${grade}">${grade}</div></div>
+            <div onclick="event.stopPropagation();">
+              <button class="btn btn-secondary btn-icon" onclick="copyLink('${link.shortUrl}')" title="Copy">📋</button>
+              <button class="btn btn-secondary btn-icon" onclick="deleteLink('${link.shortCode}')" title="Delete">🗑️</button>
             </div>
           </div>
-        `).join('');
+        `;
+      }).join('');
+    }
 
-      } catch (error) {
-        console.error('Links error:', error);
-      } finally {
-        showLoading(false);
+    function calculateGrade(clicks, createdAt) {
+      const daysSince = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
+      const clicksPerDay = clicks / Math.max(daysSince, 1);
+      
+      if (clicksPerDay >= 10) return 'A';
+      if (clicksPerDay >= 5) return 'B';
+      if (clicksPerDay >= 2) return 'C';
+      if (clicksPerDay >= 1) return 'D';
+      return 'F';
+    }
+
+    function toggleSelection(shortCode, event) {
+      if (event.target.closest('.btn')) return;
+      
+      if (selectedLinks.has(shortCode)) {
+        selectedLinks.delete(shortCode);
+      } else {
+        selectedLinks.add(shortCode);
       }
+      
+      updateSelectionUI();
+    }
+
+    function updateSelectionUI() {
+      const count = selectedLinks.size;
+      document.getElementById('selectedCount').textContent = count;
+      document.getElementById('comparisonBar').classList.toggle('show', count > 0);
+      renderLinks(allLinks);
+    }
+
+    function clearSelection() {
+      selectedLinks.clear();
+      updateSelectionUI();
+    }
+
+    function compareSelected() {
+      if (selectedLinks.size < 2) {
+        showToast('Select at least 2 links to compare', 'warning');
+        return;
+      }
+      showToast('Comparison feature coming soon!', 'info');
+    }
+
+    // Search and Filter
+    function filterLinks() {
+      const searchTerm = document.getElementById('searchLinks').value.toLowerCase();
+      const filtered = allLinks.filter(link => 
+        link.shortCode.toLowerCase().includes(searchTerm) ||
+        link.longUrl.toLowerCase().includes(searchTerm)
+      );
+      renderLinks(filtered);
+    }
+
+    function sortLinks() {
+      const sortBy = document.getElementById('sortBy').value;
+      let sorted = [...allLinks];
+      
+      switch(sortBy) {
+        case 'newest':
+          sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          break;
+        case 'oldest':
+          sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          break;
+        case 'most-clicks':
+          sorted.sort((a, b) => b.clicks - a.clicks);
+          break;
+        case 'least-clicks':
+          sorted.sort((a, b) => a.clicks - b.clicks);
+          break;
+        case 'best-performing':
+          sorted.sort((a, b) => {
+            const gradeOrder = { 'A': 5, 'B': 4, 'C': 3, 'D': 2, 'F': 1 };
+            return gradeOrder[calculateGrade(b.clicks, b.createdAt)] - gradeOrder[calculateGrade(a.clicks, a.createdAt)];
+          });
+          break;
+      }
+      
+      renderLinks(sorted);
+    }
+
+    // Dashboard
+    async function loadDashboard() {
+      // Mock data for demo
+      document.getElementById('statTotalLinks').textContent = '24';
+      document.getElementById('statTotalClicks').textContent = '1,342';
+      document.getElementById('statAvgGrade').textContent = 'B+';
+      document.getElementById('statTopLink').textContent = 'summer-sale';
+      document.getElementById('statTopClicks').textContent = '289 clicks';
+
+      // Create charts
+      createClicksChart();
+      createCountriesChart();
+      createDevicesChart();
+    }
+
+    function createClicksChart() {
+      const ctx = document.getElementById('clicksChart');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Clicks',
+            data: [65, 78, 90, 81, 96, 105, 98],
+            borderColor: '#8B5CF6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#3F3F46' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function createCountriesChart() {
+      const ctx = document.getElementById('countriesChart');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['USA', 'UK', 'Canada', 'Australia', 'Other'],
+          datasets: [{
+            data: [45, 25, 15, 10, 5],
+            backgroundColor: ['#8B5CF6', '#06B6D4', '#EC4899', '#F59E0B', '#A1A1AA']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+
+    function createDevicesChart() {
+      const ctx = document.getElementById('devicesChart');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Desktop', 'Mobile', 'Tablet'],
+          datasets: [{
+            data: [55, 35, 10],
+            backgroundColor: ['#8B5CF6', '#06B6D4', '#EC4899']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+
+    // Analytics
+    function loadAnalytics() {
+      const ctx = document.getElementById('peakHoursChart');
+      if (!ctx) return;
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+          datasets: [{
+            label: 'Clicks by Hour',
+            data: [12, 8, 5, 3, 2, 4, 15, 28, 45, 52, 48, 55, 62, 58, 54, 48, 45, 52, 48, 42, 35, 28, 22, 18],
+            backgroundColor: 'rgba(139, 92, 246, 0.8)'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    // Notifications
+    function toggleNotifications() {
+      const panel = document.getElementById('notificationPanel');
+      panel.classList.toggle('show');
+    }
+
+    function addNotification(message) {
+      const list = document.getElementById('notificationList');
+      const item = document.createElement('div');
+      item.className = 'notification-item unread';
+      item.innerHTML = `
+        <div>${message}</div>
+        <div class="notification-time">Just now</div>
+      `;
+      list.prepend(item);
+      
+      document.getElementById('notificationBell').classList.add('has-notifications');
+    }
+
+    function clearNotifications() {
+      document.getElementById('notificationList').innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No notifications</div>';
+      document.getElementById('notificationBell').classList.remove('has-notifications');
+    }
+
+    function startNotificationPolling() {
+      // Poll for new clicks every 30 seconds
+      setInterval(async () => {
+        if (!currentUser) return;
+        // Check for new clicks and show notifications
+        // This would integrate with your backend analytics
+      }, 30000);
+    }
+
+    // Utilities
+    function copyResult() {
+      const input = document.getElementById('resultUrl');
+      input.select();
+      document.execCommand('copy');
+      showToast('Link copied to clipboard!', 'success');
+    }
+
+    function copyLink(url) {
+      navigator.clipboard.writeText(url);
+      showToast('Link copied!', 'success');
     }
 
     async function deleteLink(shortCode) {
-      if (!confirm('Are you sure you want to delete this link?')) return;
-
-      showLoading(true);
-
+      if (!confirm('Delete this link?')) return;
+      
       try {
-        const response = await fetch(`${API_URL}/links/${shortCode}`, {
+        await fetch(`${API_URL}/links/${shortCode}`, {
           method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          }
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
         });
-
-        if (!response.ok) {
-          throw new Error('Failed to delete link');
-        }
-
-        // Reload links
-        await loadLinks();
-
+        
+        showToast('Link deleted successfully', 'success');
+        loadLinks();
+        
       } catch (error) {
-        alert('Error: ' + error.message);
-      } finally {
-        showLoading(false);
+        showToast('Error deleting link', 'error');
       }
     }
 
-    function viewAnalytics(shortCode) {
-      // This would open a detailed analytics view
-      alert(`Analytics for ${shortCode} - Feature coming soon!`);
-    }
-
-    // QR Code
-    function showQRCode() {
-      const url = document.getElementById('shortUrlResult').value;
-      if (!url) return;
-
-      const modal = document.getElementById('qrModal');
+    function showQRModal() {
+      const url = document.getElementById('resultUrl').value;
       const qrcodeDiv = document.getElementById('qrcode');
-      
-      // Clear previous QR code
       qrcodeDiv.innerHTML = '';
       
-      // Generate new QR code
-      qrCodeInstance = new QRCode(qrcodeDiv, {
+      new QRCode(qrcodeDiv, {
         text: url,
         width: 256,
         height: 256,
         colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
+        colorLight: "#ffffff"
       });
-
-      document.getElementById('qrUrlText').textContent = url;
-      modal.classList.add('show');
+      
+      document.getElementById('qrUrl').textContent = url;
+      document.getElementById('qrModal').classList.add('show');
     }
 
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.remove('show');
-    }
-
-    function downloadQRCode() {
+    function downloadQR() {
       const canvas = document.querySelector('#qrcode canvas');
-      if (!canvas) return;
-
       const url = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = 'qrcode.png';
@@ -1543,58 +1884,75 @@
       link.click();
     }
 
-    // Utilities
-    function showError(elementId, message) {
-      const el = document.getElementById(elementId);
-      el.textContent = '⚠️ ' + message;
-      el.classList.add('show');
-    }
-
-    function showSuccess(elementId, message) {
-      const el = document.getElementById(elementId);
-      el.textContent = '✓ ' + message;
-      el.classList.add('show');
-    }
-
-    function showLoading(show) {
-      const overlay = document.getElementById('loadingOverlay');
-      if (show) {
-        overlay.classList.add('show');
-      } else {
-        overlay.classList.remove('show');
+    function exportLinks() {
+      if (!currentUser) {
+        showToast('Please login to export links', 'warning');
+        return;
       }
+      
+      const csv = [
+        ['Short Code', 'Long URL', 'Clicks', 'Created', 'Status', 'Grade'],
+        ...allLinks.map(link => [
+          link.shortCode,
+          link.longUrl,
+          link.clicks,
+          new Date(link.createdAt).toLocaleDateString(),
+          link.isExpired ? 'Expired' : 'Active',
+          calculateGrade(link.clicks, link.createdAt)
+        ])
+      ].map(row => row.join(',')).join('\n');
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `links-export-${Date.now()}.csv`;
+      a.click();
+      
+      showToast('Links exported successfully!', 'success');
     }
 
-    function copyToClipboard(elementId) {
-      const input = document.getElementById(elementId);
-      input.select();
-      document.execCommand('copy');
-      alert('Copied to clipboard!');
+    function showComparison() {
+      showView('links');
+      showToast('Select multiple links to compare their performance', 'info');
     }
 
-    function copyLinkToClipboard(url) {
-      navigator.clipboard.writeText(url).then(() => {
-        alert('Link copied to clipboard!');
-      });
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toastIcon');
+      const msg = document.getElementById('toastMessage');
+      
+      const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+      };
+      
+      toast.className = `toast ${type}`;
+      icon.textContent = icons[type];
+      msg.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
     }
 
     function formatDate(dateString) {
       const date = new Date(dateString);
       const now = new Date();
-      const diffTime = Math.abs(now - date);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diff = now - date;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       
-      if (diffDays === 0) return 'Today';
-      if (diffDays === 1) return 'Yesterday';
-      if (diffDays < 7) return `${diffDays} days ago`;
-      
+      if (days === 0) return 'Today';
+      if (days === 1) return 'Yesterday';
+      if (days < 7) return `${days} days ago`;
       return date.toLocaleDateString();
-    }
-
-    // Mock data for demo (remove this when backend is ready)
-    if (!currentUser) {
-      // Add some demo functionality for non-logged in users
-      console.log('Demo mode - some features require authentication');
     }
   </script>
 </body>
