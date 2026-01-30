@@ -1328,7 +1328,7 @@ https://example.com/page3,</pre>
       });
 
       if (viewName === 'dashboard' && currentUser) loadDashboard();
-      if (viewName === 'links' && currentUser) loadLinks();
+      if (viewName === 'links') loadLinks();
       if (viewName === 'analytics' && currentUser) loadAnalytics();
     }
 
@@ -1481,6 +1481,7 @@ https://example.com/page3,</pre>
         
         showToast('Link created successfully!', 'success');
         addNotification(`🎉 New link created: ${data.shortCode}`);
+        loadLinks();
 
       } catch (error) {
         errorEl.textContent = '⚠️ ' + error.message;
@@ -1553,8 +1554,6 @@ https://example.com/page3,</pre>
 
     // Links Management
     async function loadLinks() {
-      if (!currentUser) return;
-
       try {
         const response = await fetch(`${API_URL}/links`, {
           headers: {

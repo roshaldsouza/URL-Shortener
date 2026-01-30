@@ -61,6 +61,17 @@ Frontend (React/HTML) ──HTTPS──> API Gateway ──> Lambda Functions �
 - Chart.js (Analytics visualization)
 - QRCode.js (QR code generation)
 
+## 📸 Screenshots
+
+| Home – Create short link | Short link result |
+|--------------------------|-------------------|
+| ![Home](screenshots/ss1.jpeg) | ![Result](screenshots/ss2.jpeg) |
+
+| Dashboard | My Links |
+|-----------|----------|
+| ![Dashboard](screenshots/ss3.jpeg) | ![Links](screenshots/ss4.jpegg) |
+
+
 ## 🛠️ Installation & Setup
 
 ### Prerequisites

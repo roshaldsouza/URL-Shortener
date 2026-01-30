@@ -25,7 +25,8 @@
                 "Action": [
                   "dynamodb:PutItem",
                   "dynamodb:GetItem",
-                  "dynamodb:UpdateItem"
+                  "dynamodb:UpdateItem",
+                  "dynamodb:Scan"
                 ],
                 "Resource": "arn:aws:dynamodb:eu-north-1:*:table/UrlMappings"
               }
@@ -110,7 +111,8 @@
                           "Action": [
                             "dynamodb:PutItem",
                             "dynamodb:GetItem",
-                            "dynamodb:UpdateItem"
+                            "dynamodb:UpdateItem",
+                            "dynamodb:Scan"
                           ],
                           "Resource": "arn:aws:dynamodb:eu-north-1:*:table/UrlMappings"
                         }
@@ -139,7 +141,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "cloud-url-shortener-deploy-bucket-018195657321",
-                  "S3Key": "serverless/cloud-url-shortener/dev/1769748629762-2026-01-30T04:50:29.762Z/cloud-url-shortener.zip"
+                  "S3Key": "serverless/cloud-url-shortener/dev/1769775987899-2026-01-30T12:26:27.899Z/cloud-url-shortener.zip"
                 },
                 "Handler": "src/lambda.handler",
                 "Runtime": "nodejs18.x",
@@ -163,14 +165,14 @@
                 "ApiLogGroup"
               ]
             },
-            "ApiLambdaVersionYF0BTZxqmkIfsIHkh3rKePizXBFqqqHGF7BddTeao": {
+            "ApiLambdaVersionv2iZO3ukB7EE2gUu1CeCGViNr1QC1xrI89vp8niNFY": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ApiLambdaFunction"
                 },
-                "CodeSha256": "fiNWVwpc1TS81EU3OJfotnf3TJfdb/TpG2Wh4FC+KYY="
+                "CodeSha256": "pRi4fmnwfyL+tTscdrrQAXM7nFhLBk1Wx/WRPejHJ5U="
               }
             },
             "HttpApi": {
@@ -303,7 +305,7 @@
             "ApiLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ApiLambdaVersionYF0BTZxqmkIfsIHkh3rKePizXBFqqqHGF7BddTeao"
+                "Ref": "ApiLambdaVersionv2iZO3ukB7EE2gUu1CeCGViNr1QC1xrI89vp8niNFY"
               },
               "Export": {
                 "Name": "sls-cloud-url-shortener-dev-ApiLambdaFunctionQualifiedArn"
@@ -362,7 +364,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "ApiLambdaVersionYF0BTZxqmkIfsIHkh3rKePizXBFqqqHGF7BddTeao"
+          "versionLogicalId": "ApiLambdaVersionv2iZO3ukB7EE2gUu1CeCGViNr1QC1xrI89vp8niNFY"
         }
       }
     },
@@ -386,7 +388,8 @@
               "Action": [
                 "dynamodb:PutItem",
                 "dynamodb:GetItem",
-                "dynamodb:UpdateItem"
+                "dynamodb:UpdateItem",
+                "dynamodb:Scan"
               ],
               "Resource": "arn:aws:dynamodb:eu-north-1:*:table/UrlMappings"
             }
@@ -471,7 +474,8 @@
                         "Action": [
                           "dynamodb:PutItem",
                           "dynamodb:GetItem",
-                          "dynamodb:UpdateItem"
+                          "dynamodb:UpdateItem",
+                          "dynamodb:Scan"
                         ],
                         "Resource": "arn:aws:dynamodb:eu-north-1:*:table/UrlMappings"
                       }
@@ -500,7 +504,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "cloud-url-shortener-deploy-bucket-018195657321",
-                "S3Key": "serverless/cloud-url-shortener/dev/1769748629762-2026-01-30T04:50:29.762Z/cloud-url-shortener.zip"
+                "S3Key": "serverless/cloud-url-shortener/dev/1769775987899-2026-01-30T12:26:27.899Z/cloud-url-shortener.zip"
               },
               "Handler": "src/lambda.handler",
               "Runtime": "nodejs18.x",
@@ -524,14 +528,14 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersionYF0BTZxqmkIfsIHkh3rKePizXBFqqqHGF7BddTeao": {
+          "ApiLambdaVersionv2iZO3ukB7EE2gUu1CeCGViNr1QC1xrI89vp8niNFY": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "fiNWVwpc1TS81EU3OJfotnf3TJfdb/TpG2Wh4FC+KYY="
+              "CodeSha256": "pRi4fmnwfyL+tTscdrrQAXM7nFhLBk1Wx/WRPejHJ5U="
             }
           },
           "HttpApi": {
@@ -664,7 +668,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionYF0BTZxqmkIfsIHkh3rKePizXBFqqqHGF7BddTeao"
+              "Ref": "ApiLambdaVersionv2iZO3ukB7EE2gUu1CeCGViNr1QC1xrI89vp8niNFY"
             },
             "Export": {
               "Name": "sls-cloud-url-shortener-dev-ApiLambdaFunctionQualifiedArn"
@@ -717,7 +721,7 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "serviceRawFile": "service: cloud-url-shortener\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n  region: eu-north-1\r\n\r\n  httpApi:\r\n    cors: true\r\n\r\n  deploymentBucket:\r\n    name: cloud-url-shortener-deploy-bucket-018195657321\r\n\r\n  environment:\r\n    DYNAMO_TABLE: UrlMappings\r\n    BASE_URL: https://tm7aoixlyh.execute-api.eu-north-1.amazonaws.com\r\n\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:PutItem\r\n            - dynamodb:GetItem\r\n            - dynamodb:UpdateItem\r\n          Resource: arn:aws:dynamodb:eu-north-1:*:table/UrlMappings\r\n\r\nfunctions:\r\n  api:\r\n    handler: src/lambda.handler\r\n    events:\r\n      - httpApi: \"*\"\r\n",
+    "serviceRawFile": "service: cloud-url-shortener\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n  region: eu-north-1\r\n\r\n  httpApi:\r\n    cors: true\r\n\r\n  deploymentBucket:\r\n    name: cloud-url-shortener-deploy-bucket-018195657321\r\n\r\n  environment:\r\n    DYNAMO_TABLE: UrlMappings\r\n    BASE_URL: https://tm7aoixlyh.execute-api.eu-north-1.amazonaws.com\r\n\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:PutItem\r\n            - dynamodb:GetItem\r\n            - dynamodb:UpdateItem\r\n            - dynamodb:Scan\r\n          Resource: arn:aws:dynamodb:eu-north-1:*:table/UrlMappings\r\n\r\nfunctions:\r\n  api:\r\n    handler: src/lambda.handler\r\n    events:\r\n      - httpApi: \"*\"\r\n",
     "command": [
       "deploy"
     ],
@@ -730,12 +734,12 @@
     "serviceProviderAwsCfStackName": "cloud-url-shortener-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:eu-north-1:018195657321:stack/cloud-url-shortener-dev/0ddd0300-fbf6-11f0-9fbe-0eef241d7a01",
     "serviceProviderAwsCfStackCreated": "2026-01-28T03:04:26.273Z",
-    "serviceProviderAwsCfStackUpdated": "2026-01-30T04:41:14.603Z",
+    "serviceProviderAwsCfStackUpdated": "2026-01-30T04:50:43.029Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "ApiLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:eu-north-1:018195657321:function:cloud-url-shortener-dev-api:4",
+        "OutputValue": "arn:aws:lambda:eu-north-1:018195657321:function:cloud-url-shortener-dev-api:5",
         "Description": "Current Lambda function version",
         "ExportName": "sls-cloud-url-shortener-dev-ApiLambdaFunctionQualifiedArn"
       },
@@ -830,7 +834,8 @@
                       "Action": [
                         "dynamodb:PutItem",
                         "dynamodb:GetItem",
-                        "dynamodb:UpdateItem"
+                        "dynamodb:UpdateItem",
+                        "dynamodb:Scan"
                       ],
                       "Resource": "arn:aws:dynamodb:eu-north-1:*:table/UrlMappings"
                     }
@@ -859,7 +864,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "cloud-url-shortener-deploy-bucket-018195657321",
-              "S3Key": "serverless/cloud-url-shortener/dev/1769748629762-2026-01-30T04:50:29.762Z/cloud-url-shortener.zip"
+              "S3Key": "serverless/cloud-url-shortener/dev/1769775987899-2026-01-30T12:26:27.899Z/cloud-url-shortener.zip"
             },
             "Handler": "src/lambda.handler",
             "Runtime": "nodejs18.x",
@@ -883,14 +888,14 @@
             "ApiLogGroup"
           ]
         },
-        "ApiLambdaVersionYF0BTZxqmkIfsIHkh3rKePizXBFqqqHGF7BddTeao": {
+        "ApiLambdaVersionv2iZO3ukB7EE2gUu1CeCGViNr1QC1xrI89vp8niNFY": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "ApiLambdaFunction"
             },
-            "CodeSha256": "fiNWVwpc1TS81EU3OJfotnf3TJfdb/TpG2Wh4FC+KYY="
+            "CodeSha256": "pRi4fmnwfyL+tTscdrrQAXM7nFhLBk1Wx/WRPejHJ5U="
           }
         },
         "HttpApi": {
@@ -1022,7 +1027,7 @@
         "ApiLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "ApiLambdaVersionYF0BTZxqmkIfsIHkh3rKePizXBFqqqHGF7BddTeao"
+            "Ref": "ApiLambdaVersionv2iZO3ukB7EE2gUu1CeCGViNr1QC1xrI89vp8niNFY"
           },
           "Export": {
             "Name": "sls-cloud-url-shortener-dev-ApiLambdaFunctionQualifiedArn"

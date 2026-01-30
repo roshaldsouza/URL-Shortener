@@ -4,6 +4,7 @@ const {
   PutCommand,
   GetCommand,
   UpdateCommand,
+  ScanCommand,
 } = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({
@@ -68,4 +69,25 @@ async function findUrl(shortCode) {
   }
 }
 
-module.exports = { saveUrl, findUrl };
+// List all URL mappings (for "My Links")
+async function listAllUrls() {
+  try {
+    const command = new ScanCommand({
+      TableName: TABLE_NAME,
+    });
+    const result = await ddb.send(command);
+    const items = (result.Items || []).map((item) => ({
+      shortCode: item.shortCode,
+      longUrl: item.longUrl,
+      clickCount: item.clickCount || 0,
+      createdAt: item.createdAt,
+      isExpired: false,
+    }));
+    return items;
+  } catch (error) {
+    console.error("Error listing URLs from DynamoDB:", error);
+    throw error;
+  }
+}
+
+module.exports = { saveUrl, findUrl, listAllUrls };

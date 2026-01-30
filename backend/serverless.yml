@@ -23,6 +23,7 @@ provider:
             - dynamodb:PutItem
             - dynamodb:GetItem
             - dynamodb:UpdateItem
+            - dynamodb:Scan
           Resource: arn:aws:dynamodb:eu-north-1:*:table/UrlMappings
 
 functions:
