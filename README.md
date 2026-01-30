@@ -69,7 +69,7 @@ Frontend (React/HTML) ──HTTPS──> API Gateway ──> Lambda Functions �
 
 | Dashboard | My Links |
 |-----------|----------|
-| ![Dashboard](screenshots/ss3.jpeg) | ![Links](screenshots/ss4.jpegg) |
+| ![Dashboard](screenshots/ss3.jpeg) | ![Links](screenshots/ss4.jpeg) |
 
 
 ## 🛠️ Installation & Setup
