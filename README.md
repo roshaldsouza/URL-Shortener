@@ -354,9 +354,9 @@ MIT License - see [LICENSE](LICENSE) file for details
 ## 👨‍💻 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
+- GitHub: [@roshaldsouza](https://github.com/roshaldsouza)
+- LinkedIn: [Roshal Dsouza](https://linkedin.com/in/roshaldsouza)
+- Email: roshalds789@example.com
 
 ## ⭐ Show Your Support
 
