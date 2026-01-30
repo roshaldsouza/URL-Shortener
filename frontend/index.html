@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkShort - Professional URL Shortener</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Satoshi:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --electric-violet: #8B5CF6;
+      --cyber-blue: #06B6D4;
+      --neon-pink: #EC4899;
+      --lime: #84CC16;
+      --bg-deep: #09090B;
+      --bg-elevated: #18181B;
+      --bg-card: #27272A;
+      --text-primary: #FAFAFA;
+      --text-secondary: #A1A1AA;
+      --border: #3F3F46;
+      --success: #10B981;
+      --error: #EF4444;
+      --warning: #F59E0B;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Satoshi', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.15;
+      z-index: 0;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    body::before {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--electric-violet), var(--cyber-blue));
+      top: -300px;
+      right: -300px;
+    }
+
+    body::after {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--neon-pink), var(--lime));
+      bottom: -250px;
+      left: -250px;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    .grid-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Navigation */
+    nav {
+      position: relative;
+      z-index: 10;
+      padding: 24px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(24, 24, 27, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--electric-violet), var(--cyber-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--electric-violet);
+    }
+
+    .btn {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--electric-violet), var(--cyber-blue));
+      border: none;
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Satoshi', sans-serif;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--electric-violet);
+      box-shadow: none;
+    }
+
+    /* Container */
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Views */
+    .view {
+      display: none;
+      animation: fadeIn 0.5s;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 60px 0;
+    }
+
+    .hero h1 {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 72px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, var(--electric-violet), var(--cyber-blue), var(--neon-pink));
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero p {
+      font-size: 20px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+    }
+
+    /* Card */
+    .card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(90deg, var(--electric-violet), var(--cyber-blue), var(--neon-pink), var(--lime), var(--electric-violet));
+      background-size: 300% 300%;
+      border-radius: 24px;
+      z-index: -1;
+      animation: gradientShift 6s ease infinite;
+      opacity: 0.3;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      opacity: 0.5;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="url"] {
+      width: 100%;
+      padding: 18px 20px 18px 56px;
+      background: var(--bg-deep);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-family: 'Satoshi', sans-serif;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--electric-violet);
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    }
+
+    input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    /* Error & Success Messages */
+    .message {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .message.show {
+      display: block;
+      animation: slideIn 0.3s;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 2px solid var(--error);
+      color: var(--error);
+    }
+
+    .success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 2px solid var(--success);
+      color: var(--success);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--electric-violet);
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      font-family: 'Clash Display', sans-serif;
+      background: linear-gradient(135deg, var(--electric-violet), var(--cyber-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-change {
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .stat-change.positive {
+      color: var(--success);
+    }
+
+    .stat-change.negative {
+      color: var(--error);
+    }
+
+    /* Links Table */
+    .links-table {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 100px;
+      gap: 16px;
+      padding: 20px 24px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 100px;
+      gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      transition: background 0.2s;
+    }
+
+    .table-row:hover {
+      background: var(--bg-elevated);
+    }
+
+    .table-row:last-child {
+      border-bottom: none;
+    }
+
+    .link-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .short-url {
+      color: var(--cyber-blue);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .short-url:hover {
+      color: var(--electric-violet);
+    }
+
+    .long-url {
+      font-size: 13px;
+      color: var(--text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .clicks-badge {
+      background: rgba(139, 92, 246, 0.1);
+      color: var(--electric-violet);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+
+    .icon-btn:hover {
+      border-color: var(--electric-violet);
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    /* Chart Container */
+    .chart-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .chart-header {
+      margin-bottom: 20px;
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .chart-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .loading-overlay.show {
+      display: flex;
+    }
+
+    .loader {
+      text-align: center;
+    }
+
+    .loader .spinner {
+      width: 48px;
+      height: 48px;
+      border-width: 4px;
+      margin-bottom: 16px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .empty-text {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav {
+        padding: 16px 20px;
+        flex-wrap: wrap;
+      }
+
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+        margin-top: 16px;
+      }
+
+      .hero h1 {
+        font-size: 40px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .card {
+        padding: 24px;
+      }
+
+      .table-header,
+      .table-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .table-header {
+        display: none;
+      }
+
+      .link-info {
+        grid-column: 1;
+      }
+
+      .actions {
+        justify-content: flex-start;
+        grid-column: 1;
+      }
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 24px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+    }
+
+    .modal-header {
+      margin-bottom: 24px;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'Clash Display', sans-serif;
+    }
+
+    .qr-code-container {
+      text-align: center;
+      padding: 20px;
+      background: white;
+      border-radius: 16px;
+      margin: 20px 0;
+    }
+
+    #qrcode {
+      display: inline-block;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .badge-error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-pattern"></div>
+  
+  <!-- Navigation -->
+  <nav>
+    <div class="logo">🔗 LinkShort</div>
+    <div class="nav-links" id="navLinks">
+      <a class="nav-link active" data-view="home">Home</a>
+      <a class="nav-link" data-view="dashboard">Dashboard</a>
+      <a class="nav-link" data-view="links">My Links</a>
+    </div>
+    <div id="authButtons">
+      <button class="btn btn-secondary" onclick="showView('login')">Login</button>
+      <button class="btn" onclick="showView('signup')">Sign Up</button>
+    </div>
+    <div id="userMenu" style="display: none;">
+      <span id="userEmail" style="margin-right: 16px; color: var(--text-secondary);"></span>
+      <button class="btn btn-secondary" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Home View -->
+    <div id="homeView" class="view active">
+      <div class="hero">
+        <h1>Shorten URL</h1>
+        <p>Transform lengthy URLs into sleek, shareable links with powerful analytics.</p>
+      </div>
+
+      <div class="card">
+        <form id="shortenForm">
+          <div class="form-group">
+            <label class="form-label">Enter Your Long URL</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔗</span>
+              <input 
+                type="url" 
+                id="longUrl" 
+                placeholder="https://www.example.com/very-long-url..."
+                required
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Custom Short Code (Optional)</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✏️</span>
+              <input 
+                type="text" 
+                id="customCode" 
+                placeholder="my-custom-link"
+                pattern="[a-zA-Z0-9-_]+"
+              >
+            </div>
+            <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 8px;">
+              Only letters, numbers, hyphens, and underscores
+            </small>
+          </div>
+
+          <div class="form-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="enableExpiration">
+              <label for="enableExpiration" style="cursor: pointer;">Enable link expiration (7 days)</label>
+            </div>
+          </div>
+
+          <div id="homeError" class="message error"></div>
+          <div id="homeSuccess" class="message success"></div>
+
+          <button type="submit" class="btn" style="width: 100%;" id="shortenBtn">
+            <span>✨ Shorten Now</span>
+          </button>
+        </form>
+
+        <div id="result" style="display: none; margin-top: 32px;">
+          <div style="padding: 24px; background: rgba(16, 185, 129, 0.05); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+              <div style="width: 32px; height: 32px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center;">✓</div>
+              <span style="color: var(--success); font-weight: 700; text-transform: uppercase; font-size: 14px;">Link Created Successfully!</span>
+            </div>
+            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+              <input type="text" id="shortUrlResult" readonly style="flex: 1; padding: 16px; font-weight: 600; color: var(--success);">
+              <button class="btn" onclick="copyToClipboard('shortUrlResult')">📋 Copy</button>
+              <button class="btn btn-secondary" onclick="showQRCode()">QR Code</button>
+            </div>
+            <a id="shortLinkResult" href="#" target="_blank" style="color: var(--cyber-blue); text-decoration: none; font-weight: 600;">Open link →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboardView" class="view">
+      <div style="margin-bottom: 32px;">
+        <h2 style="font-family: 'Clash Display', sans-serif; font-size: 48px; margin-bottom: 8px;">Analytics Dashboard</h2>
+        <p style="color: var(--text-secondary); font-size: 16px;">Track your link performance in real-time</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Links</div>
+          <div class="stat-value" id="totalLinks">0</div>
+          <div class="stat-change positive" id="linksChange">+0 this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Clicks</div>
+          <div class="stat-value" id="totalClicks">0</div>
+          <div class="stat-change positive" id="clicksChange">+0 this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Click Rate</div>
+          <div class="stat-value" id="clickRate">0%</div>
+          <div class="stat-change" id="rateChange">Average per link</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Top Performer</div>
+          <div class="stat-value" style="font-size: 24px;" id="topLink">-</div>
+          <div class="stat-change" id="topClicks">0 clicks</div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">Clicks Over Time</div>
+          <div class="chart-subtitle">Last 7 days</div>
+        </div>
+        <canvas id="clicksChart" height="80"></canvas>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div class="chart-container">
+          <div class="chart-header">
+            <div class="chart-title">Top Locations</div>
+            <div class="chart-subtitle">By country</div>
+          </div>
+          <canvas id="locationsChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <div class="chart-header">
+            <div class="chart-title">Devices</div>
+            <div class="chart-subtitle">Desktop vs Mobile</div>
+          </div>
+          <canvas id="devicesChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Links View -->
+    <div id="linksView" class="view">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+        <div>
+          <h2 style="font-family: 'Clash Display', sans-serif; font-size: 48px; margin-bottom: 8px;">My Links</h2>
+          <p style="color: var(--text-secondary); font-size: 16px;">Manage all your shortened URLs</p>
+        </div>
+        <button class="btn" onclick="showView('home')">+ Create New Link</button>
+      </div>
+
+      <div id="linksContainer">
+        <div class="links-table">
+          <div class="table-header">
+            <div>Link</div>
+            <div>Created</div>
+            <div>Clicks</div>
+            <div>Status</div>
+            <div>Actions</div>
+          </div>
+          <div id="linksTableBody">
+            <!-- Links will be inserted here -->
+          </div>
+        </div>
+      </div>
+
+      <div id="emptyLinks" class="empty-state" style="display: none;">
+        <div class="empty-icon">🔗</div>
+        <div class="empty-title">No Links Yet</div>
+        <div class="empty-text">Create your first shortened link to get started</div>
+        <button class="btn" onclick="showView('home')">Create Link</button>
+      </div>
+    </div>
+
+    <!-- Login View -->
+    <div id="loginView" class="view">
+      <div style="max-width: 500px; margin: 60px auto;">
+        <div class="card">
+          <h2 style="font-family: 'Clash Display', sans-serif; font-size: 36px; margin-bottom: 8px;">Welcome Back</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 32px;">Login to access your dashboard</p>
+
+          <form id="loginForm">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <div class="input-wrapper">
+                <span class="input-icon">📧</span>
+                <input type="email" id="loginEmail" placeholder="you@example.com" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <div class="input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="loginPassword" placeholder="••••••••" required>
+              </div>
+            </div>
+
+            <div id="loginError" class="message error"></div>
+
+            <button type="submit" class="btn" style="width: 100%; margin-bottom: 16px;" id="loginBtn">
+              Login
+            </button>
+
+            <div style="text-align: center; color: var(--text-secondary);">
+              Don't have an account? <a href="#" onclick="showView('signup'); return false;" style="color: var(--electric-violet); text-decoration: none; font-weight: 600;">Sign Up</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signup View -->
+    <div id="signupView" class="view">
+      <div style="max-width: 500px; margin: 60px auto;">
+        <div class="card">
+          <h2 style="font-family: 'Clash Display', sans-serif; font-size: 36px; margin-bottom: 8px;">Create Account</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 32px;">Start shortening URLs with analytics</p>
+
+          <form id="signupForm">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <div class="input-wrapper">
+                <span class="input-icon">👤</span>
+                <input type="text" id="signupName" placeholder="John Doe" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <div class="input-wrapper">
+                <span class="input-icon">📧</span>
+                <input type="email" id="signupEmail" placeholder="you@example.com" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <div class="input-wrapper">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="signupPassword" placeholder="••••••••" required minlength="8">
+              </div>
+              <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 8px;">
+                At least 8 characters
+              </small>
+            </div>
+
+            <div id="signupError" class="message error"></div>
+            <div id="signupSuccess" class="message success"></div>
+
+            <button type="submit" class="btn" style="width: 100%; margin-bottom: 16px;" id="signupBtn">
+              Create Account
+            </button>
+
+            <div style="text-align: center; color: var(--text-secondary);">
+              Already have an account? <a href="#" onclick="showView('login'); return false;" style="color: var(--electric-violet); text-decoration: none; font-weight: 600;">Login</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Code Modal -->
+  <div id="qrModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('qrModal')">×</button>
+      <div class="modal-header">
+        <h3 class="modal-title">QR Code</h3>
+        <p style="color: var(--text-secondary); margin-top: 8px;">Scan to access your shortened link</p>
+      </div>
+      <div class="qr-code-container">
+        <div id="qrcode"></div>
+      </div>
+      <div style="text-align: center;">
+        <p id="qrUrlText" style="margin-bottom: 16px; color: var(--text-secondary); word-break: break-all;"></p>
+        <button class="btn" onclick="downloadQRCode()">📥 Download QR Code</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loader">
+      <div class="spinner"></div>
+      <div style="color: var(--text-primary); font-weight: 600;">Loading...</div>
+    </div>
+  </div>
+
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <script>
+    // Configuration
+    const API_URL = "https://tm7aoixlyh.execute-api.eu-north-1.amazonaws.com";
+    
+    // State Management
+    let currentUser = null;
+    let currentShortCode = null;
+    let qrCodeInstance = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      setupEventListeners();
+    });
+
+    function setupEventListeners() {
+      // Shorten form
+      document.getElementById('shortenForm').addEventListener('submit', handleShorten);
+      
+      // Auth forms
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+      document.getElementById('signupForm').addEventListener('submit', handleSignup);
+
+      // Navigation
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const view = e.target.dataset.view;
+          showView(view);
+        });
+      });
+    }
+
+    // View Management
+    function showView(viewName) {
+      // Hide all views
+      document.querySelectorAll('.view').forEach(view => {
+        view.classList.remove('active');
+      });
+
+      // Show selected view
+      const view = document.getElementById(viewName + 'View');
+      if (view) {
+        view.classList.add('active');
+      }
+
+      // Update navigation
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.dataset.view === viewName) {
+          link.classList.add('active');
+        }
+      });
+
+      // Load data for specific views
+      if (viewName === 'dashboard' && currentUser) {
+        loadDashboard();
+      } else if (viewName === 'links' && currentUser) {
+        loadLinks();
+      }
+    }
+
+    // Authentication
+    function checkAuth() {
+      const token = localStorage.getItem('authToken');
+      const user = localStorage.getItem('user');
+      
+      if (token && user) {
+        currentUser = JSON.parse(user);
+        updateAuthUI(true);
+      } else {
+        updateAuthUI(false);
+      }
+    }
+
+    function updateAuthUI(isAuthenticated) {
+      const authButtons = document.getElementById('authButtons');
+      const userMenu = document.getElementById('userMenu');
+      const navLinks = document.getElementById('navLinks');
+
+      if (isAuthenticated) {
+        authButtons.style.display = 'none';
+        userMenu.style.display = 'flex';
+        document.getElementById('userEmail').textContent = currentUser.email;
+        
+        // Show dashboard and links tabs
+        navLinks.querySelectorAll('[data-view="dashboard"], [data-view="links"]').forEach(el => {
+          el.style.display = 'block';
+        });
+      } else {
+        authButtons.style.display = 'flex';
+        userMenu.style.display = 'none';
+        
+        // Hide dashboard and links tabs
+        navLinks.querySelectorAll('[data-view="dashboard"], [data-view="links"]').forEach(el => {
+          el.style.display = 'none';
+        });
+        
+        showView('home');
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      const errorEl = document.getElementById('loginError');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Logging in...';
+      errorEl.classList.remove('show');
+
+      try {
+        const response = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+
+        // Store auth data
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        currentUser = data.user;
+
+        updateAuthUI(true);
+        showView('dashboard');
+        
+      } catch (error) {
+        showError('loginError', error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Login';
+      }
+    }
+
+    async function handleSignup(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('signupName').value;
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+      const btn = document.getElementById('signupBtn');
+      const errorEl = document.getElementById('signupError');
+      const successEl = document.getElementById('signupSuccess');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Creating account...';
+      errorEl.classList.remove('show');
+      successEl.classList.remove('show');
+
+      try {
+        const response = await fetch(`${API_URL}/auth/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Signup failed');
+        }
+
+        // Show success and redirect to login
+        showSuccess('signupSuccess', 'Account created! Redirecting to login...');
+        setTimeout(() => {
+          showView('login');
+          document.getElementById('loginEmail').value = email;
+        }, 2000);
+        
+      } catch (error) {
+        showError('signupError', error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Create Account';
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      currentUser = null;
+      updateAuthUI(false);
+      showView('home');
+    }
+
+    // URL Shortening
+    async function handleShorten(e) {
+      e.preventDefault();
+      
+      const longUrl = document.getElementById('longUrl').value.trim();
+      const customCode = document.getElementById('customCode').value.trim();
+      const enableExpiration = document.getElementById('enableExpiration').checked;
+      const btn = document.getElementById('shortenBtn');
+      const errorEl = document.getElementById('homeError');
+      const successEl = document.getElementById('homeSuccess');
+      const resultEl = document.getElementById('result');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Shortening...';
+      errorEl.classList.remove('show');
+      successEl.classList.remove('show');
+      resultEl.style.display = 'none';
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (currentUser) {
+          headers['Authorization'] = `Bearer ${localStorage.getItem('authToken')}`;
+        }
+
+        const body = {
+          longUrl,
+          ...(customCode && { customCode }),
+          ...(enableExpiration && { expiresIn: 7 * 24 * 60 * 60 }) // 7 days in seconds
+        };
+
+        const response = await fetch(`${API_URL}/shorten`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(body)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to shorten URL');
+        }
+
+        // Show result
+        currentShortCode = data.shortCode;
+        document.getElementById('shortUrlResult').value = data.shortUrl;
+        document.getElementById('shortLinkResult').href = data.shortUrl;
+        document.getElementById('shortLinkResult').textContent = 'Open link →';
+        resultEl.style.display = 'block';
+
+        // Reset form
+        document.getElementById('shortenForm').reset();
+        
+      } catch (error) {
+        showError('homeError', error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>✨ Shorten Now</span>';
+      }
+    }
+
+    // Dashboard
+    async function loadDashboard() {
+      if (!currentUser) return;
+
+      showLoading(true);
+
+      try {
+        const response = await fetch(`${API_URL}/analytics/dashboard`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load dashboard');
+        }
+
+        // Update stats
+        document.getElementById('totalLinks').textContent = data.totalLinks || 0;
+        document.getElementById('totalClicks').textContent = data.totalClicks || 0;
+        document.getElementById('clickRate').textContent = data.clickRate ? `${data.clickRate}%` : '0%';
+        document.getElementById('topLink').textContent = data.topLink?.shortCode || '-';
+        document.getElementById('topClicks').textContent = `${data.topLink?.clicks || 0} clicks`;
+
+        // Update charts
+        updateClicksChart(data.clicksOverTime || []);
+        updateLocationsChart(data.topLocations || []);
+        updateDevicesChart(data.deviceStats || {});
+
+      } catch (error) {
+        console.error('Dashboard error:', error);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function updateClicksChart(data) {
+      const ctx = document.getElementById('clicksChart');
+      
+      if (window.clicksChart) {
+        window.clicksChart.destroy();
+      }
+
+      window.clicksChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map(d => d.date),
+          datasets: [{
+            label: 'Clicks',
+            data: data.map(d => d.clicks),
+            borderColor: '#8B5CF6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#3F3F46' },
+              ticks: { color: '#A1A1AA' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#A1A1AA' }
+            }
+          }
+        }
+      });
+    }
+
+    function updateLocationsChart(data) {
+      const ctx = document.getElementById('locationsChart');
+      
+      if (window.locationsChart) {
+        window.locationsChart.destroy();
+      }
+
+      window.locationsChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: data.map(d => d.country),
+          datasets: [{
+            data: data.map(d => d.clicks),
+            backgroundColor: [
+              '#8B5CF6',
+              '#06B6D4',
+              '#EC4899',
+              '#84CC16',
+              '#F59E0B'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#A1A1AA' }
+            }
+          }
+        }
+      });
+    }
+
+    function updateDevicesChart(data) {
+      const ctx = document.getElementById('devicesChart');
+      
+      if (window.devicesChart) {
+        window.devicesChart.destroy();
+      }
+
+      window.devicesChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Desktop', 'Mobile', 'Tablet'],
+          datasets: [{
+            data: [data.desktop || 0, data.mobile || 0, data.tablet || 0],
+            backgroundColor: ['#8B5CF6', '#06B6D4', '#EC4899']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#A1A1AA' }
+            }
+          }
+        }
+      });
+    }
+
+    // Links Management
+    async function loadLinks() {
+      if (!currentUser) return;
+
+      showLoading(true);
+
+      try {
+        const response = await fetch(`${API_URL}/links`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load links');
+        }
+
+        const container = document.getElementById('linksTableBody');
+        const emptyState = document.getElementById('emptyLinks');
+
+        if (!data.links || data.links.length === 0) {
+          document.getElementById('linksContainer').style.display = 'none';
+          emptyState.style.display = 'block';
+          return;
+        }
+
+        document.getElementById('linksContainer').style.display = 'block';
+        emptyState.style.display = 'none';
+
+        container.innerHTML = data.links.map(link => `
+          <div class="table-row">
+            <div class="link-info">
+              <a href="${link.shortUrl}" target="_blank" class="short-url">${link.shortCode}</a>
+              <div class="long-url">${link.longUrl}</div>
+            </div>
+            <div style="color: var(--text-secondary); font-size: 14px;">${formatDate(link.createdAt)}</div>
+            <div><span class="clicks-badge">${link.clicks || 0} clicks</span></div>
+            <div>
+              ${link.isExpired ? 
+                '<span class="badge badge-error">Expired</span>' : 
+                '<span class="badge badge-success">Active</span>'}
+            </div>
+            <div class="actions">
+              <button class="icon-btn" onclick="viewAnalytics('${link.shortCode}')" title="Analytics">📊</button>
+              <button class="icon-btn" onclick="copyLinkToClipboard('${link.shortUrl}')" title="Copy">📋</button>
+              <button class="icon-btn" onclick="deleteLink('${link.shortCode}')" title="Delete">🗑️</button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        console.error('Links error:', error);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    async function deleteLink(shortCode) {
+      if (!confirm('Are you sure you want to delete this link?')) return;
+
+      showLoading(true);
+
+      try {
+        const response = await fetch(`${API_URL}/links/${shortCode}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete link');
+        }
+
+        // Reload links
+        await loadLinks();
+
+      } catch (error) {
+        alert('Error: ' + error.message);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function viewAnalytics(shortCode) {
+      // This would open a detailed analytics view
+      alert(`Analytics for ${shortCode} - Feature coming soon!`);
+    }
+
+    // QR Code
+    function showQRCode() {
+      const url = document.getElementById('shortUrlResult').value;
+      if (!url) return;
+
+      const modal = document.getElementById('qrModal');
+      const qrcodeDiv = document.getElementById('qrcode');
+      
+      // Clear previous QR code
+      qrcodeDiv.innerHTML = '';
+      
+      // Generate new QR code
+      qrCodeInstance = new QRCode(qrcodeDiv, {
+        text: url,
+        width: 256,
+        height: 256,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      document.getElementById('qrUrlText').textContent = url;
+      modal.classList.add('show');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    function downloadQRCode() {
+      const canvas = document.querySelector('#qrcode canvas');
+      if (!canvas) return;
+
+      const url = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = 'qrcode.png';
+      link.href = url;
+      link.click();
+    }
+
+    // Utilities
+    function showError(elementId, message) {
+      const el = document.getElementById(elementId);
+      el.textContent = '⚠️ ' + message;
+      el.classList.add('show');
+    }
+
+    function showSuccess(elementId, message) {
+      const el = document.getElementById(elementId);
+      el.textContent = '✓ ' + message;
+      el.classList.add('show');
+    }
+
+    function showLoading(show) {
+      const overlay = document.getElementById('loadingOverlay');
+      if (show) {
+        overlay.classList.add('show');
+      } else {
+        overlay.classList.remove('show');
+      }
+    }
+
+    function copyToClipboard(elementId) {
+      const input = document.getElementById(elementId);
+      input.select();
+      document.execCommand('copy');
+      alert('Copied to clipboard!');
+    }
+
+    function copyLinkToClipboard(url) {
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffTime = Math.abs(now - date);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      
+      return date.toLocaleDateString();
+    }
+
+    // Mock data for demo (remove this when backend is ready)
+    if (!currentUser) {
+      // Add some demo functionality for non-logged in users
+      console.log('Demo mode - some features require authentication');
+    }
+  </script>
+</body>
+</html>

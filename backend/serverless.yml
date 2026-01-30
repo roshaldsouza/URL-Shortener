@@ -1,0 +1,32 @@
+service: cloud-url-shortener
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-north-1
+
+  httpApi:
+    cors: true
+
+  deploymentBucket:
+    name: cloud-url-shortener-deploy-bucket-018195657321
+
+  environment:
+    DYNAMO_TABLE: UrlMappings
+    BASE_URL: https://tm7aoixlyh.execute-api.eu-north-1.amazonaws.com
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+          Resource: arn:aws:dynamodb:eu-north-1:*:table/UrlMappings
+
+functions:
+  api:
+    handler: src/lambda.handler
+    events:
+      - httpApi: "*"
