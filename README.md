@@ -317,11 +317,6 @@ npm run deploy
 npm run deploy:prod
 ```
 
-### Rollback
-```bash
-serverless rollback --timestamp TIMESTAMP
-```
-
 ### Remove Stack
 ```bash
 npm run remove
