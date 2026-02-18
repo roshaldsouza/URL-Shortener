@@ -333,25 +333,6 @@ npm run remove
 - [ ] Geographic routing
 - [ ] Link preview generation
 
-## 📝 Resume Talking Points
-
-When discussing this project in interviews:
-
-1. **System Design**: "Designed a serverless architecture using AWS Lambda and DynamoDB that auto-scales to handle millions of requests while maintaining <100ms response times"
-
-2. **Analytics**: "Implemented comprehensive analytics tracking including geo-location, device detection, and referrer tracking, processing over 10K+ analytics events per day"
-
-3. **Authentication**: "Built secure JWT-based authentication with bcrypt password hashing and implemented role-based access control"
-
-4. **Performance**: "Optimized DynamoDB queries with GSI design, reducing query times by 60% and implementing TTL for automatic link expiration"
-
-5. **Cost Optimization**: "Achieved 95% cost reduction compared to EC2-based solutions using serverless architecture and DynamoDB on-demand pricing"
-
-6. **Full-Stack**: "Developed both backend REST API and responsive frontend with real-time analytics dashboard using Chart.js"
-
-## 🤝 Contributing
-
-Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 
 ## 📄 License
 
