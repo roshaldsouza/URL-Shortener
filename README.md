@@ -251,16 +251,6 @@ Response: 200 OK
 }
 ```
 
-## 💰 Cost Analysis
-
-**Monthly costs for 100,000 requests:**
-
-| Service | Cost |
-|---------|------|
-| Lambda | $0.20 |
-| DynamoDB | $1.25 |
-| API Gateway | $0.35 |
-| **Total** | **~$2/month** |
 
 ## 🔐 Security Features
 
