@@ -142,49 +142,7 @@ netlify deploy --prod
 vercel --prod
 ```
 
-## 📚 API Documentation
 
-### Public Endpoints
-
-#### Shorten URL
-```http
-POST /shorten
-Content-Type: application/json
-
-{
-  "longUrl": "https://example.com/very-long-url",
-  "customCode": "my-link",    // Optional
-  "expiresIn": 604800          // Optional, seconds (7 days)
-}
-
-Response: 201 Created
-{
-  "shortUrl": "https://short.link/abc123",
-  "shortCode": "abc123",
-  "longUrl": "https://example.com/very-long-url"
-}
-```
-
-#### Redirect
-```http
-GET /{shortCode}
-
-Response: 302 Redirect to longUrl
-```
-
-### Authentication Endpoints
-
-#### Sign Up
-```http
-POST /auth/signup
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "securePassword123"
-}
-```
 
 #### Login
 ```http
